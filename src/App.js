@@ -7,7 +7,7 @@ import './styles/tailwind.css';
 
 function App() {
   return (
-    <div className="bg-black">
+    <div>
       <Header />
       <Sidebar />
       <MainContent />
