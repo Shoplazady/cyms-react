@@ -1,8 +1,8 @@
 import React from 'react';
-import Header from './Components/Header';
-import Sidebar from './Components/Sidebar';
-import MainContent from './Components/MainContent';
-import Footer from './Components/Footer';
+import Header from './components/Header';
+import Sidebar from './components/Sidebar';
+import MainContent from './components/MainContent';
+import Footer from './components/Footer';
 import './styles/tailwind.css';
 
 function App() {

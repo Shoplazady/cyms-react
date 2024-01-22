@@ -1,0 +1,14 @@
+// login.js
+
+import React from 'react';
+
+const Login = () => {
+  return (
+    <div>
+      <h1>Login Page</h1>
+      {/* Add your login form and content here */}
+    </div>
+  );
+};
+
+export default Login;
