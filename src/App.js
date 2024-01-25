@@ -1,18 +1,26 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { DarkModeProvider } from './hooks/useDarkMode';
 import Header from './components/Header';
-import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
+import Login from './components/pages/Login';
 import Footer from './components/Footer';
 import './styles/tailwind.css';
 
 function App() {
   return (
-    <div>
-      <Header />
-      <Sidebar />
-      <MainContent />
-      <Footer />
-    </div>
+    <DarkModeProvider>
+      <Router>
+        <div>
+          <Header />
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<MainContent />} />
+          </Routes>
+          <Footer />
+        </div>
+      </Router>
+    </DarkModeProvider>
   );
 }
 

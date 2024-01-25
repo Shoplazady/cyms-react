@@ -1,5 +1,6 @@
-// Navbar.js
 import React, { useState } from "react";
+import { Link } from 'react-router-dom';
+import { useDarkMode } from '../hooks/useDarkMode';
 import { IoMdMoon, IoMdSunny, IoIosCreate, IoMdHelp } from "react-icons/io";
 import { FaCartShopping } from "react-icons/fa6";
 import { FaListOl, FaUserEdit } from "react-icons/fa";
@@ -21,11 +22,7 @@ import {
 
 const Navbar = () => {
     const [openNav, setOpenNav] = React.useState(false);
-    const [isDarkMode, setDarkMode] = useState(false);
-
-    const toggleDarkMode = () => {
-        setDarkMode(!isDarkMode);
-    };
+    const { isDarkMode, toggleDarkMode } = useDarkMode();
 
     //Profile menu
 
@@ -50,15 +47,6 @@ const Navbar = () => {
             icon: FiLogOut,
         },
     ];
-
-    React.useEffect(() => {
-        // Implement logic to set dark mode in your application (e.g., apply dark theme classes to the body)
-        if (isDarkMode) {
-            document.body.classList.add("dark");
-        } else {
-            document.body.classList.remove("dark");
-        }
-    }, [isDarkMode]);
 
     React.useEffect(() => {
         window.addEventListener(
@@ -111,10 +99,7 @@ const Navbar = () => {
                 className="flex items-center gap-x-2 p-1 font-medium"
             >
                 <IoNotifications />
-
-                <a href="#" className="flex items-center">
-                    Log in
-                </a>
+                <Link to="/login">Log in</Link>
             </Typography>
         </ul>
     );
@@ -128,7 +113,7 @@ const Navbar = () => {
                     href="#"
                     className="mr-4 cursor-pointer py-1.5 font-large"
                 >
-                    CYMS
+                    <Link to="/">CYMS</Link>
                 </Typography>
                 <div className="hidden lg:block">{navList}</div>
                 <div className="flex items-center gap-x-1 ml-auto lg:ml-0 justify-end">

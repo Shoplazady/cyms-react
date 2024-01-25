@@ -4,7 +4,7 @@ const MainContent = () => {
   return (
   <>
     <main>
-      
+    <h1>home Page</h1>
     </main> 
   </>
   );
