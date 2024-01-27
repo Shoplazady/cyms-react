@@ -1,7 +1,6 @@
-// useDarkMode.js
 import { createContext, useContext, useState, useEffect } from 'react';
 
-const DarkModeContext = createContext();
+export const DarkModeContext = createContext();
 
 export const useDarkMode = () => {
   const context = useContext(DarkModeContext);
@@ -19,12 +18,20 @@ export const DarkModeProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // Implement logic to set dark mode in your application (e.g., apply dark theme classes to the body)
+    // Access the HTML body element
+    const body = document.body;
+  
+    // Add or remove 'dark' class based on isDarkMode state
     if (isDarkMode) {
-      document.body.classList.add('dark');
+      body.classList.add('dark');
     } else {
-      document.body.classList.remove('dark');
+      body.classList.remove('dark');
     }
+  
+    // Cleanup function to remove the class when the component is unmounted
+    return () => {
+      body.classList.remove('dark');
+    };
   }, [isDarkMode]);
 
   const value = {
