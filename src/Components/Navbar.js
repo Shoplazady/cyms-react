@@ -76,7 +76,7 @@ const Navbar = () => {
     );
 
     return (
-        <MaterialNavbar className={`mx-auto px-2 sm:px-6 lg:px-8 bg-stone-900 border-0 shadow-lg dark:bg-stone-200`}>
+        <MaterialNavbar className={`max-w-full px-2 sm:px-6 lg:px-8 bg-stone-900 border-0 shadow-lg dark:bg-stone-200`}>
             <div className={`relative flex h-16 items-center justify-between text-stone-300 dark:text-black`}>
                 <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                     {/* Mobile menu button - top left */}
@@ -93,7 +93,7 @@ const Navbar = () => {
                     <div className="flex flex-shrink-0 items-center">
                         <Link to="/">
                             <img
-                                src={require("../components/images/logo.png")}
+                                src={require("../Components/images/logo.png")}
                                 alt="CYMS Logo"
                                 style={{ width: "40px", height: "40px" }}
                             />

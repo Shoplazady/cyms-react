@@ -16,7 +16,7 @@ import {
   MenuItem,
   Avatar,
 } from "@material-tailwind/react";
-import Logo from '../../components/images/logo.png';
+import Logo from '../../Components/images/logo.png';
 
 const Header = ({ onToggleSidebar, sidebarOpen }) => {
 

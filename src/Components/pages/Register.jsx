@@ -15,7 +15,7 @@ const Register = () => {
                 <div class="w-full max-w-md bg-stone-900 rounded-lg shadow-lg dark:bg-white border-gray-200 sm:w-full">
                     <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
                         <img
-                            src={require("../../components/images/logo_full.png")}
+                            src={require("../../Components/images/logo_full.png")}
                             alt="CYMS Logo"
                             style={{ width: "400px", height: "auto" }}
                         />
