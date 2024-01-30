@@ -1,28 +1,59 @@
-import React from 'react';
+import React, { useEffect , useRef} from 'react';
 import { Link } from 'react-router-dom';
 import { useDarkMode } from '../../hooks/useDarkMode';
 import { IoMdMoon, IoMdSunny, IoMdHelp } from "react-icons/io";
-import { FaUserEdit } from "react-icons/fa";
+import { FaUserEdit, FaArrowLeft } from "react-icons/fa";
 import { IoNotifications } from "react-icons/io5";
-import { FiAlignJustify, FiArrowUp, FiLogOut } from "react-icons/fi";
+import { FiAlignJustify, FiLogOut } from "react-icons/fi";
 import {
   Navbar as MaterialNavbar,
   Typography,
   Button,
-  IconButton,
   Menu,
   MenuHandler,
   MenuList,
   MenuItem,
   Avatar,
 } from "@material-tailwind/react";
-import Logo from '../../Components/images/logo.png';
+import LogoFull from '../../Components/images/logo_full.png';
+import LogoMobile from '../../Components/images/logo.png';
+import Sidebar from './Sidebar';
 
-const Header = ({ onToggleSidebar, sidebarOpen }) => {
+const Header = () => {
 
   const { isDarkMode, toggleDarkMode } = useDarkMode();
 
+  const headerRef = useRef(null);
+
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+
+  const handleToggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const isMobile = window.innerWidth <= 768;
+
+  useEffect(() => {
+    const setLogoSize = () => {
+      const logo = document.getElementById('logo');
+      if (logo) {
+        if (isMobile) {
+          logo.style.width = '40px';
+        } else {
+          logo.style.width = '200px';
+        }
+      }
+    };
+
+    setLogoSize();
+    window.addEventListener('resize', setLogoSize);
+
+    return () => {
+      window.removeEventListener('resize', setLogoSize);
+    };
+  }, [isMobile]);
 
   const profileMenuItems = [
     {
@@ -40,28 +71,32 @@ const Header = ({ onToggleSidebar, sidebarOpen }) => {
   ];
 
   return (
-    <header>
-      <MaterialNavbar className={`mx-auto px-2 sm:px-6 lg:px-8 bg-stone-900 border-0 shadow-lg dark:bg-stone-200`}>
+    <header ref={headerRef}>
+      <MaterialNavbar className={`max-w-full mx-auto px-2 sm:px-6 lg:px-8 bg-stone-900 border-0 shadow-lg dark:bg-stone-200`}>
         <div className={`relative flex h-16 items-center justify-between text-stone-300 dark:text-black`}>
-          <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+          <div className="flex flex-1 items-center justify-center xl:items-stretch xl:justify-start">
             {/* Sidebar open when phone or tablet*/}
-            <div className="lg:hidden xl:hidden md:hidden absolute top-0 left-0 ml-4">
-              <IconButton
+            <div className="lg:hidden xl:hidden  absolute top-0 left-0 ml-4">
+              <Button
                 variant="text"
                 className="p-2"
-                ripple={false}
-                onClick={onToggleSidebar}
+                onClick={handleToggleSidebar}
               >
-                {sidebarOpen ? (
-                  <FiArrowUp className="h-8 w-8 text-white dark:text-black " />
+                {isSidebarOpen ? (
+                  <FaArrowLeft className="h-8 w-8 text-white dark:text-black " />
                 ) : (
                   <FiAlignJustify className="mx-auto h-8 w-8 text-white dark:text-black" />
                 )}
-              </IconButton>
+              </Button>
             </div>
             <div className="flex flex-shrink-0 items-center">
-              <Link to="/">
-                <img src={Logo} alt="CYMS Logo" style={{ width: "40px", height: "40px" }} />
+              <Link to="/admin">
+                <img
+                  id="logo"
+                  src={isMobile ? LogoMobile : LogoFull}
+                  alt="CYMS Logo"
+                  style={{ height: "auto" }}
+                />
               </Link>
             </div>
           </div>
@@ -139,6 +174,7 @@ const Header = ({ onToggleSidebar, sidebarOpen }) => {
           </div>
         </div>
       </MaterialNavbar>
+      <Sidebar isSidebarOpen={isSidebarOpen} onToggleSidebar={handleToggleSidebar} />
     </header>
   );
 };

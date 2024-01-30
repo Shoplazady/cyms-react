@@ -1,14 +1,16 @@
 import React from 'react';
 import AdminHeader from './components/Header'; 
-import AdminSidebar from './components/Sidebar'; 
+import AdminDashboard from './Dashboard/AdminDashboard'; 
 
 const AdminLayout = ({ children }) => {
   return (
     <>
       <AdminHeader />
       <div className="flex">
-        <AdminSidebar />
-        <div className="flex-1">{children}</div>
+        <div className="flex-1">
+          <AdminDashboard />
+          {children}
+          </div>
       </div>
     </>
   );
