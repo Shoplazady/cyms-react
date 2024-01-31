@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDarkMode } from '../../hooks/useDarkMode';
 import { IoMdMoon, IoMdSunny, IoMdHelp } from "react-icons/io";
-import { FaUserEdit, FaArrowLeft } from "react-icons/fa";
+import { FaUserEdit, FaUserAstronaut} from "react-icons/fa";
 import { IoNotifications } from "react-icons/io5";
 import { FiAlignJustify, FiLogOut } from "react-icons/fi";
 import {
@@ -21,9 +21,11 @@ const Header = ({ onToggleSidebar }) => {
 
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
-  const [isSidebarOpen] = React.useState(false);
-
   const profileMenuItems = [
+    {
+      label: "User name",
+      icon: FaUserAstronaut,
+    },
     {
       label: "Edit Profile",
       icon: FaUserEdit,
@@ -49,12 +51,8 @@ const Header = ({ onToggleSidebar }) => {
                 variant="text"
                 className="p-2"
                 onClick={onToggleSidebar}
-              >
-                {isSidebarOpen ? (
-                  <FaArrowLeft className="h-8 w-8 text-white dark:text-black " />
-                ) : (
+              >                
                   <FiAlignJustify className="mx-auto h-8 w-8 text-white dark:text-black" />
-                )}
               </Button>
             </div>
           </div>
@@ -98,7 +96,7 @@ const Header = ({ onToggleSidebar }) => {
                   </MenuHandler>
                   {/* Profile menu */}
                   {isMenuOpen && (
-                    <MenuList className={`p-1 ${isDarkMode ? 'bg-neutral-100 text-stone-800' : 'bg-zinc-700 text-stone-100'}`}>
+                    <MenuList className="p-1 space-y-2 border-0 font-medium bg-zinc-700 dark:bg-neutral-100 text-stone-100 dark:text-stone-900">
                       {profileMenuItems.map(({ label, icon }, key) => (
                         <MenuItem
                           key={label}
