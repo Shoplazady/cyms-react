@@ -1,5 +1,4 @@
-import React, { useEffect , useRef} from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
 import { useDarkMode } from '../../hooks/useDarkMode';
 import { IoMdMoon, IoMdSunny, IoMdHelp } from "react-icons/io";
 import { FaUserEdit, FaArrowLeft } from "react-icons/fa";
@@ -15,45 +14,14 @@ import {
   MenuItem,
   Avatar,
 } from "@material-tailwind/react";
-import LogoFull from '../../Components/images/logo_full.png';
-import LogoMobile from '../../Components/images/logo.png';
-import Sidebar from './Sidebar';
 
-const Header = () => {
+const Header = ({ onToggleSidebar }) => {
 
   const { isDarkMode, toggleDarkMode } = useDarkMode();
 
-  const headerRef = useRef(null);
-
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
-
-  const handleToggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  const isMobile = window.innerWidth <= 768;
-
-  useEffect(() => {
-    const setLogoSize = () => {
-      const logo = document.getElementById('logo');
-      if (logo) {
-        if (isMobile) {
-          logo.style.width = '40px';
-        } else {
-          logo.style.width = '200px';
-        }
-      }
-    };
-
-    setLogoSize();
-    window.addEventListener('resize', setLogoSize);
-
-    return () => {
-      window.removeEventListener('resize', setLogoSize);
-    };
-  }, [isMobile]);
+  const [isSidebarOpen] = React.useState(false);
 
   const profileMenuItems = [
     {
@@ -71,8 +39,8 @@ const Header = () => {
   ];
 
   return (
-    <header ref={headerRef}>
-      <MaterialNavbar className={`max-w-full mx-auto px-2 sm:px-6 lg:px-8 bg-stone-900 border-0 shadow-lg dark:bg-stone-200`}>
+    <header>
+      <MaterialNavbar className={`max-w-full mx-auto px-2 duration-300 ease-linear sm:px-6 lg:px-8 bg-stone-900 border-0 shadow-lg dark:bg-gray-50`}>
         <div className={`relative flex h-16 items-center justify-between text-stone-300 dark:text-black`}>
           <div className="flex flex-1 items-center justify-center xl:items-stretch xl:justify-start">
             {/* Sidebar open when phone or tablet*/}
@@ -80,7 +48,7 @@ const Header = () => {
               <Button
                 variant="text"
                 className="p-2"
-                onClick={handleToggleSidebar}
+                onClick={onToggleSidebar}
               >
                 {isSidebarOpen ? (
                   <FaArrowLeft className="h-8 w-8 text-white dark:text-black " />
@@ -88,16 +56,6 @@ const Header = () => {
                   <FiAlignJustify className="mx-auto h-8 w-8 text-white dark:text-black" />
                 )}
               </Button>
-            </div>
-            <div className="flex flex-shrink-0 items-center">
-              <Link to="/admin">
-                <img
-                  id="logo"
-                  src={isMobile ? LogoMobile : LogoFull}
-                  alt="CYMS Logo"
-                  style={{ height: "auto" }}
-                />
-              </Link>
             </div>
           </div>
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
@@ -174,7 +132,6 @@ const Header = () => {
           </div>
         </div>
       </MaterialNavbar>
-      <Sidebar isSidebarOpen={isSidebarOpen} onToggleSidebar={handleToggleSidebar} />
     </header>
   );
 };

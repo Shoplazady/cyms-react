@@ -1,13 +1,14 @@
+//User.jsx
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
-const AdminDashboard = () => {
+const UserManage = () => {
     return (
         <>
-            <h2>Admin Dashboard</h2>
+            <h2>User edit page</h2>
             <Outlet />
         </>
     );
 };
 
-export default AdminDashboard;
+export default UserManage;
