@@ -18,9 +18,9 @@ const AdminLayout = () => {
       <div className="bg-stone-900 dark:bg-gray-50">
         <div className="flex h-screen overflow-hidden">
           <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
-          <div class="flex flex-1 flex-col">
+          <div class="flex flex-1 flex-col w-auto">
             <AdminHeader onToggleSidebar={handleToggleSidebar} />
-            <main className='flex-1 bg-stone-800 dark:bg-stone-200 duration-300 ease-linear'>
+            <main className='flex-1 overflow-y-auto overflow-x-auto  shadow-inner bg-stone-800 dark:bg-stone-100 duration-300 ease-linear'>
               <div className="mx-auto max-w-full p-2 md:p-4 2xl:p-6">
                 <Routes>
                   <Route path="admin/" element={<AdminDashboard />} />

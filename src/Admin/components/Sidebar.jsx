@@ -8,7 +8,6 @@ import { FaPlus, FaList, FaAngleDown } from 'react-icons/fa';
 import { FaClipboardCheck } from "react-icons/fa6";
 import Logo from '../../Components/images/logo_full.png';
 import { Button } from "@material-tailwind/react";
-import { FaArrowLeft, FaBars, FaWindowClose } from "react-icons/fa";
 import { IoIosArrowDropleftCircle } from "react-icons/io";
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
