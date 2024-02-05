@@ -42,7 +42,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             </Link>
           </li>
           <li>
-            <Link to="/" className="flex items-center p-2 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-300 group">
+            <Link to="admin/Order" className="flex items-center p-2 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-300 group">
               <FaPlus className="flex-shrink-0 w-5 h-5 text-gray-300 transition duration-75 dark:text-gray-700" />
               <span className="flex-1 ms-3 whitespace-nowrap">Create order</span>
             </Link>
