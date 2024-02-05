@@ -20,7 +20,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   };
 
   return (
-    <aside className={`fixed top-0 left-0 z-40 flex h-screen w-64 flex-col overflow-y-hidden duration-300 ease-linear bg-stone-900 dark:bg-stone-50 lg:static lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`} aria-label="Sidebar" >
+    <aside className={`fixed top-0 left-0 z-30 flex h-screen w-64 flex-col overflow-y-hidden duration-300 ease-linear bg-stone-900 dark:bg-stone-50 lg:static lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`} aria-label="Sidebar" >
       <div className="h-full px-3 py-4 overflow-y-auto">
           {/* Logo */}
           <div className="flex items-center justify-center mb-4">

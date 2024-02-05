@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { IoIosArrowDown } from 'react-icons/io';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { FaArrowsUpDown } from "react-icons/fa6";
 import { MdLocalPrintshop } from "react-icons/md";
@@ -9,21 +8,59 @@ import {
     MenuList,
     MenuItem,
     Avatar,
-    Modal,
     Button,
+    Dialog,
+    DialogHeader,
+    DialogBody,
+    DialogFooter,
 } from '@material-tailwind/react';
 
 const OrderTable = () => {
+
+    const [openModal, setOpenModal] = useState(false);
+
+    const handleOpenModal = () => setOpenModal(!openModal);
 
     return (
 
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
             <div className="flex items-center justify-between flex-column p-2 md:flex-row flex-wrap bg-gray-700 dark:bg-gray-50">
-                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-100 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-gray-900  dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800">
+                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden 
+                text-sm font-medium text-gray-100 rounded-lg group bg-gradient-to-br
+                 from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-gray-900 
+                 dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
+                    onClick={handleOpenModal}
+                >
                     <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-800 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
                         Create order
                     </span>
                 </Button>
+                <Dialog
+                    open={openModal}
+                    handler={handleOpenModal}
+                    className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                >
+                    <DialogHeader>Its a simple dialog.</DialogHeader>
+                    <DialogBody>
+                        The key to more success is to have a lot of pillows. Put it this way,
+                        it took me twenty five years to get these plants, twenty five years of
+                        blood sweat and tears, and I&apos;m never giving up, I&apos;m just
+                        getting started. I&apos;m up to something. Fan luv.
+                    </DialogBody>
+                    <DialogFooter>
+                        <Button
+                            variant="text"
+                            color="red"
+                            onClick={handleOpenModal}
+                            className="mr-1"
+                        >
+                            <span>Cancel</span>
+                        </Button>
+                        <Button variant="gradient" color="green" onClick={handleOpenModal}>
+                            <span>Confirm</span>
+                        </Button>
+                    </DialogFooter>
+                </Dialog>
                 {/* Search input on the right */}
                 <div className="flex items-center">
                     <label htmlFor="table-search" className="sr-only text-black">
@@ -178,6 +215,42 @@ const OrderTable = () => {
                     </tbody>
                 </table>
             </div>
+            <nav className="flex items-center flex-column flex-wrap md:flex-row justify-between p-4 bg-gray-700 dark:bg-gray-50" aria-label="Table navigation">
+                <span className="text-sm font-medium text-gray-100 dark:text-gray-900 mb-4 md:mb-0 block w-full md:inline md:w-auto">
+                    Showing <span className='text-gray-300 dark:text-gray-500'>1-10</span> of <span className='text-gray-300 dark:text-gray-500'>1000</span>
+                </span>
+                <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
+                    <li>
+                        <a
+                            href="#"
+                            className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-100 bg-gray-700 border border-stone-800 rounded-s-lg hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black"
+                        >
+                            Previous
+                        </a>
+                    </li>
+                    {/* ... Page links ... */}
+                    <li>
+                        <a href="#" className="flex items-center justify-center px-3 h-8 leading-tight text-gray-100 bg-gray-700 border border-gray-900 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">1</a>
+                    </li>
+                    <li>
+                        <a href="#" className="flex items-center justify-center px-3 h-8 leading-tight text-gray-100 bg-gray-700 border border-gray-900 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">2</a>
+                    </li>
+                    <li>
+                        <a href="#" aria-current="page" className="flex items-center justify-center px-3 h-8 text-gray-100 bg-gray-700 border border-gray-900 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">3</a>
+                    </li>
+                    <li>
+                        <a href="#" className="flex items-center justify-center px-3 h-8 leading-tight text-gray-100 bg-gray-700 border border-gray-900 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">4</a>
+                    </li>
+                    <li>
+                        <a
+                            href="#"
+                            className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-100 bg-gray-700 border border-gray-900 rounded-e-lg hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black"
+                        >
+                            Next
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
 
 
