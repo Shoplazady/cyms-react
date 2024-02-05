@@ -14,12 +14,19 @@ import {
     DialogBody,
     DialogFooter,
 } from '@material-tailwind/react';
+import CreateuserModal from './../Modal/CreateuserModal';
 
 const OrderTable = () => {
 
     const [openModal, setOpenModal] = useState(false);
 
-    const handleOpenModal = () => setOpenModal(!openModal);
+    const handleOpenModal = () => {
+        setOpenModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setOpenModal(false);
+    };
 
     return (
 
@@ -35,32 +42,8 @@ const OrderTable = () => {
                         Create order
                     </span>
                 </Button>
-                <Dialog
-                    open={openModal}
-                    handler={handleOpenModal}
-                    className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                >
-                    <DialogHeader>Its a simple dialog.</DialogHeader>
-                    <DialogBody>
-                        The key to more success is to have a lot of pillows. Put it this way,
-                        it took me twenty five years to get these plants, twenty five years of
-                        blood sweat and tears, and I&apos;m never giving up, I&apos;m just
-                        getting started. I&apos;m up to something. Fan luv.
-                    </DialogBody>
-                    <DialogFooter>
-                        <Button
-                            variant="text"
-                            color="red"
-                            onClick={handleOpenModal}
-                            className="mr-1"
-                        >
-                            <span>Cancel</span>
-                        </Button>
-                        <Button variant="gradient" color="green" onClick={handleOpenModal}>
-                            <span>Confirm</span>
-                        </Button>
-                    </DialogFooter>
-                </Dialog>
+                {/* Modal create user */}
+                <CreateuserModal open={openModal} onClose={handleCloseModal} />
                 {/* Search input on the right */}
                 <div className="flex items-center">
                     <label htmlFor="table-search" className="sr-only text-black">
