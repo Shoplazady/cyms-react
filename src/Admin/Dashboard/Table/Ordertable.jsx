@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { AiOutlineSearch } from 'react-icons/ai';
+import { Link } from 'react-router-dom';
+import { AiOutlineSearch , AiFillDashboard } from 'react-icons/ai';
 import { FaArrowsUpDown } from "react-icons/fa6";
-import { MdLocalPrintshop } from "react-icons/md";
+import { MdLocalPrintshop , MdOutlineKeyboardArrowRight } from "react-icons/md";
 import {
     Menu,
     MenuHandler,
@@ -15,35 +16,53 @@ import {
     DialogFooter,
 } from '@material-tailwind/react';
 import CreateuserModal from './../Modal/CreateuserModal';
+import EdituserModal from './../Modal/EdituserModal';
 
 const OrderTable = () => {
 
-    const [openModal, setOpenModal] = useState(false);
+    const [createUserModalOpen, setCreateUserModalOpen] = useState(false);
+    const [editUserModalOpen, setEditUserModalOpen] = useState(false);
 
-    const handleOpenModal = () => {
-        setOpenModal(true);
-    };
+    const openCreateUserModal = () => setCreateUserModalOpen(true);
+    const closeCreateUserModal = () => setCreateUserModalOpen(false);
 
-    const handleCloseModal = () => {
-        setOpenModal(false);
-    };
+    const openEditUserModal = () => setEditUserModalOpen(true);
+    const closeEditUserModal = () => setEditUserModalOpen(false);
 
     return (
 
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+
+            <nav className="flex p-3" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+                    <li class="inline-flex items-center">
+                        <Link to="/admin/" class="inline-flex items-center text-sm font-medium text-gray-50 hover:text-blue-600 dark:text-gray-900 dark:hover:text-blue-600">
+                            <AiFillDashboard className='w-3 h-3 me-2.5' />
+                            Dashboard
+                        </Link>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            < MdOutlineKeyboardArrowRight className='w-6 h-6 text-gray-300' />
+                            <h6 class="ms-1 text-sm font-medium text-gray-50 hover:text-blue-600 md:ms-2 dark:text-gray-900 dark:hover:text-blue-600">Order</h6>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+
             <div className="flex items-center justify-between flex-column p-2 md:flex-row flex-wrap bg-gray-700 dark:bg-gray-50">
                 <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden 
                 text-sm font-medium text-gray-100 rounded-lg group bg-gradient-to-br
                  from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-gray-900 
                  dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
-                    onClick={handleOpenModal}
+                    onClick={openCreateUserModal}
                 >
                     <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-800 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
                         Create order
                     </span>
                 </Button>
                 {/* Modal create user */}
-                <CreateuserModal open={openModal} onClose={handleCloseModal} />
+                <CreateuserModal open={createUserModalOpen} onClose={closeCreateUserModal} />
                 {/* Search input on the right */}
                 <div className="flex items-center">
                     <label htmlFor="table-search" className="sr-only text-black">
@@ -130,8 +149,13 @@ const OrderTable = () => {
                             <td className="px-6 py-4">
                                 $2999
                             </td>
-                            <td className="flex items-center justify-between px-6 py-4">
-                                <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit </a>
+                            <td className="flex items-center space-x-3 px-6 py-4">
+                                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800" onClick={openEditUserModal}>
+                                    <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
+                                        Edit
+                                    </span>
+                                </Button>
+                                <EdituserModal open={editUserModalOpen} onClose={closeEditUserModal} />
                                 <MdLocalPrintshop className='w-5 h-5' />
                             </td>
                         </tr>
@@ -160,8 +184,13 @@ const OrderTable = () => {
                             <td className="px-6 py-4">
                                 $2999
                             </td>
-                            <td className="flex items-center justify-between px-6 py-4">
-                                <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit </a>
+                            <td className="flex items-center space-x-3 px-6 py-4">
+                                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800" onClick={openEditUserModal}>
+                                    <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
+                                        Edit
+                                    </span>
+                                </Button>
+                                <EdituserModal open={editUserModalOpen} onClose={closeEditUserModal} />
                                 <MdLocalPrintshop className='w-5 h-5' />
                             </td>
                         </tr>
@@ -190,8 +219,13 @@ const OrderTable = () => {
                             <td className="px-6 py-4">
                                 $2999
                             </td>
-                            <td className="flex items-center justify-between px-6 py-4">
-                                <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit </a>
+                            <td className="flex items-center space-x-3 px-6 py-4">
+                                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800" onClick={openEditUserModal}>
+                                    <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
+                                        Edit
+                                    </span>
+                                </Button>
+                                <EdituserModal open={editUserModalOpen} onClose={closeEditUserModal} />
                                 <MdLocalPrintshop className='w-5 h-5' />
                             </td>
                         </tr>

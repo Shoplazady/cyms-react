@@ -1,11 +1,12 @@
 import React from 'react';
 import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@material-tailwind/react';
 
-const CreateuserModal = ({ open, onClose }) => {
+const Edituser = ({ open, onClose }) => {
+    
     return (
         <Dialog open={open} handler={onClose} className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-opacity-5 text-gray-100 dark:text-gray-900">
             <div className="max-w-xl bg-gray-700 dark:bg-gray-100 p-8 rounded-md overflow-y-auto max-h-screen">
-                <DialogHeader>สมัครสมาชิก</DialogHeader>
+                <DialogHeader>Edit User</DialogHeader>
                 <DialogBody className='text-gray-100 dark:text-gray-900'>
                     <form>
                         <div class="grid gap-6 mb-6 md:grid-cols-2">
@@ -79,4 +80,4 @@ const CreateuserModal = ({ open, onClose }) => {
     );
 };
 
-export default CreateuserModal;
+export default Edituser;

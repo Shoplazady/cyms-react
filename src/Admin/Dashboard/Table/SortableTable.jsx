@@ -9,20 +9,37 @@ import {
     Avatar,
     Button,
 } from '@material-tailwind/react';
+import CreateuserModal from './../Modal/CreateuserModal';
+import EdituserModal from './../Modal/EdituserModal';
 
 const SortableTable = () => {
 
+    const [createUserModalOpen, setCreateUserModalOpen] = useState(false);
+    const [editUserModalOpen, setEditUserModalOpen] = useState(false);
+
+    const openCreateUserModal = () => setCreateUserModalOpen(true);
+    const closeCreateUserModal = () => setCreateUserModalOpen(false);
+
+    const openEditUserModal = () => setEditUserModalOpen(true);
+    const closeEditUserModal = () => setEditUserModalOpen(false);
 
     return (
 
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
             {/* ... Other content ... */}
             <div className="flex items-center justify-between flex-column p-2 md:flex-row flex-wrap bg-gray-700 dark:bg-gray-50">
-                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-100 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-gray-900  dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800">
+                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden 
+                text-sm font-medium text-gray-100 rounded-lg group bg-gradient-to-br
+                 from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-gray-900 
+                 dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
+                    onClick={openCreateUserModal}
+                >
                     <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-800 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
                         Create order
                     </span>
                 </Button>
+                {/* Modal create user */}
+                <CreateuserModal open={createUserModalOpen} onClose={closeCreateUserModal} />
                 {/* Search input on the right */}
                 <div className="flex items-center">
                     <label htmlFor="table-search" className="sr-only text-black">
@@ -107,90 +124,16 @@ const SortableTable = () => {
                                 </div>
                             </td>
                             <td className="px-6 py-4">
-                                <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                                    Edit user
-                                </a>
+                                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800" onClick={openEditUserModal}>
+                                    <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
+                                        Edit
+                                    </span>
+                                </Button>
+                                <EdituserModal open={editUserModalOpen} onClose={closeEditUserModal} />
                             </td>
                         </tr>
-                        <tr className="bg-gray-800 border-b border-gray-500 dark:bg-gray-50 dark:border-gray-300 hover:bg-gray-900 dark:hover:bg-gray-100">
-                            {/* ... Table row content ... */}
-                            <td className="w-4 p-4">
-                                <div className="flex items-center">
-                                    <input
-                                        id="checkbox-table-search-1"
-                                        type="checkbox"
-                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                    />
-                                    <label htmlFor="checkbox-table-search-1" className="sr-only">
-                                        checkbox
-                                    </label>
-                                </div>
-                            </td>
-                            <td className="flex items-center px-6 py-4 text-gray-100 whitespace-nowrap dark:text-gray-900">
-                                <Avatar
-                                    variant="circular"
-                                    alt="Your Name"
-                                    className="w-10 h-10 rounded-full"
-                                    style={{ width: '40px', height: '40px' }}
-                                    src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
-                                />
-                                <div className="ps-3">
-                                    <div className="text-base font-semibold">Neil Sims</div>
-                                    <div className="font-normal">neil.sims@flowbite.com</div>
-                                </div>
-                            </td>
-                            <td className="px-6 py-4 text-gray-100 whitespace-nowrap dark:text-gray-900">React Developer</td>
-                            <td className="px-6 py-4 text-gray-100 whitespace-nowrap dark:text-gray-900">
-                                <div className="flex items-center">
-                                    <div className="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Online
-                                </div>
-                            </td>
-                            <td className="px-6 py-4">
-                                <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                                    Edit user
-                                </a>
-                            </td>
-                        </tr>
-                        <tr className="bg-gray-800 border-b border-gray-500 dark:bg-gray-50 dark:border-gray-300 hover:bg-gray-900 dark:hover:bg-gray-100">
-                            {/* ... Table row content ... */}
-                            <td className="w-4 p-4">
-                                <div className="flex items-center">
-                                    <input
-                                        id="checkbox-table-search-1"
-                                        type="checkbox"
-                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                    />
-                                    <label htmlFor="checkbox-table-search-1" className="sr-only">
-                                        checkbox
-                                    </label>
-                                </div>
-                            </td>
-                            <td className="flex items-center px-6 py-4 text-gray-100 whitespace-nowrap dark:text-gray-900">
-                                <Avatar
-                                    variant="circular"
-                                    alt="Your Name"
-                                    className="w-10 h-10 rounded-full"
-                                    style={{ width: '40px', height: '40px' }}
-                                    src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
-                                />
-                                <div className="ps-3">
-                                    <div className="text-base font-semibold">Neil Sims</div>
-                                    <div className="font-normal">neil.sims@flowbite.com</div>
-                                </div>
-                            </td>
-                            <td className="px-6 py-4 text-gray-100 whitespace-nowrap dark:text-gray-900">React Developer</td>
-                            <td className="px-6 py-4 text-gray-100 whitespace-nowrap dark:text-gray-900">
-                                <div className="flex items-center">
-                                    <div className="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Online
-                                </div>
-                            </td>
-                            <td className="px-6 py-4">
-                                <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                                    Edit user
-                                </a>
-                            </td>
-                        </tr>
-                        {/* ... Additional table rows ... */}
+                        
+
                     </tbody>
                 </table>
             </div>
