@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AiOutlineSearch , AiFillDashboard } from 'react-icons/ai';
+import { AiOutlineSearch, AiFillDashboard } from 'react-icons/ai';
 import { FaArrowsUpDown } from "react-icons/fa6";
-import { MdLocalPrintshop , MdOutlineKeyboardArrowRight } from "react-icons/md";
+import { MdLocalPrintshop, MdOutlineKeyboardArrowRight } from "react-icons/md";
+import { FiEdit } from "react-icons/fi";
 import {
     Menu,
     MenuHandler,
@@ -15,19 +16,25 @@ import {
     DialogBody,
     DialogFooter,
 } from '@material-tailwind/react';
-import CreateuserModal from './../Modal/CreateuserModal';
-import EdituserModal from './../Modal/EdituserModal';
+import CreateorderModal from './../Modal/CreateorderModal';
+import EdituserModal from './../Modal/EditorderModal';
+import DetailorderModal from './../Modal/DetailorderModal';
+
 
 const OrderTable = () => {
 
-    const [createUserModalOpen, setCreateUserModalOpen] = useState(false);
-    const [editUserModalOpen, setEditUserModalOpen] = useState(false);
+    const [createOrderModalOpen, setCreateOrderModalOpen] = useState(false);
+    const [editOrderModalOpen, setEditOrderModalOpen] = useState(false);
+    const [detailOrderModalOpen, setDetailOrderModalOpen] = useState(false);
 
-    const openCreateUserModal = () => setCreateUserModalOpen(true);
-    const closeCreateUserModal = () => setCreateUserModalOpen(false);
+    const openCreateOrderModal = () => setCreateOrderModalOpen(true);
+    const closeCreateOrderModal = () => setCreateOrderModalOpen(false);
 
-    const openEditUserModal = () => setEditUserModalOpen(true);
-    const closeEditUserModal = () => setEditUserModalOpen(false);
+    const openEditOrderModal = () => setEditOrderModalOpen(true);
+    const closeEditOrderModal = () => setEditOrderModalOpen(false);
+
+    const openDetailOrderModal = () => setDetailOrderModalOpen(true);
+    const closeDetailOrderModal = () => setDetailOrderModalOpen(false);
 
     return (
 
@@ -55,14 +62,14 @@ const OrderTable = () => {
                 text-sm font-medium text-gray-100 rounded-lg group bg-gradient-to-br
                  from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-gray-900 
                  dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
-                    onClick={openCreateUserModal}
+                    onClick={openCreateOrderModal}
                 >
                     <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-800 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
                         Create order
                     </span>
                 </Button>
                 {/* Modal create user */}
-                <CreateuserModal open={createUserModalOpen} onClose={closeCreateUserModal} />
+                <CreateorderModal open={createOrderModalOpen} onClose={closeCreateOrderModal} />
                 {/* Search input on the right */}
                 <div className="flex items-center">
                     <label htmlFor="table-search" className="sr-only text-black">
@@ -98,17 +105,26 @@ const OrderTable = () => {
                                 </div>
                             </th>
                             <th scope="col" class="px-6 py-3">
-                                Product name
+                                No.
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Employee name
                             </th>
                             <th scope="col" class="px-6 py-3">
                                 <div className="flex items-center">
-                                    Color
+                                    Order detail
                                     <FaArrowsUpDown className='w-3 h-3 ms-1.5' />
                                 </div>
                             </th>
                             <th scope="col" class="px-6 py-3">
                                 <div className="flex items-center">
-                                    Category
+                                    Date create
+                                    <FaArrowsUpDown className='w-3 h-3 ms-1.5' />
+                                </div>
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                <div className="flex items-center">
+                                    Status
                                     <FaArrowsUpDown className='w-3 h-3 ms-1.5' />
                                 </div>
                             </th>
@@ -137,11 +153,21 @@ const OrderTable = () => {
                                     </label>
                                 </div>
                             </td>
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-200 whitespace-nowrap dark:text-gray-900">
-                                Apple MacBook Pro 17"
-                            </th>
                             <td className="px-6 py-4">
-                                Silver
+                                10005578
+                            </td>
+                            <th scope="row" className="px-6 py-4 font-medium text-gray-200 whitespace-nowrap dark:text-gray-900">
+                                John wick
+                            </th>
+                            <td className="flex items-center justify-between px-6 py-4">
+                                Order detail
+                                <FiEdit 
+                                className='hover:text-blue-500'
+                                onClick={openDetailOrderModal} />
+                                <DetailorderModal open={detailOrderModalOpen} onClose={closeDetailOrderModal} />
+                            </td>
+                            <td className="px-6 py-4">
+                                15/5/67
                             </td>
                             <td className="px-6 py-4">
                                 Laptop
@@ -150,82 +176,13 @@ const OrderTable = () => {
                                 $2999
                             </td>
                             <td className="flex items-center space-x-3 px-6 py-4">
-                                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800" onClick={openEditUserModal}>
+                                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
+                                    onClick={openEditOrderModal}>
                                     <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
                                         Edit
                                     </span>
                                 </Button>
-                                <EdituserModal open={editUserModalOpen} onClose={closeEditUserModal} />
-                                <MdLocalPrintshop className='w-5 h-5' />
-                            </td>
-                        </tr>
-                        <tr className="bg-gray-800 border-b border-gray-700 dark:bg-white dark:border-gray-200">
-                            <td className="w-4 p-4">
-                                <div className="flex items-center">
-                                    <input
-                                        id="checkbox-table-search-1"
-                                        type="checkbox"
-                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                    />
-                                    <label htmlFor="checkbox-table-search-1" className="sr-only">
-                                        checkbox
-                                    </label>
-                                </div>
-                            </td>
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-200 whitespace-nowrap dark:text-gray-900">
-                                Apple MacBook Pro 17"
-                            </th>
-                            <td className="px-6 py-4">
-                                Silver
-                            </td>
-                            <td className="px-6 py-4">
-                                Laptop
-                            </td>
-                            <td className="px-6 py-4">
-                                $2999
-                            </td>
-                            <td className="flex items-center space-x-3 px-6 py-4">
-                                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800" onClick={openEditUserModal}>
-                                    <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
-                                        Edit
-                                    </span>
-                                </Button>
-                                <EdituserModal open={editUserModalOpen} onClose={closeEditUserModal} />
-                                <MdLocalPrintshop className='w-5 h-5' />
-                            </td>
-                        </tr>
-                        <tr className="bg-gray-800 border-b border-gray-700 dark:bg-white dark:border-gray-200">
-                            <td className="w-4 p-4">
-                                <div className="flex items-center">
-                                    <input
-                                        id="checkbox-table-search-1"
-                                        type="checkbox"
-                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                    />
-                                    <label htmlFor="checkbox-table-search-1" className="sr-only">
-                                        checkbox
-                                    </label>
-                                </div>
-                            </td>
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-200 whitespace-nowrap dark:text-gray-900">
-                                Apple MacBook Pro 17"
-                            </th>
-                            <td className="px-6 py-4">
-                                Silver
-                            </td>
-                            <td className="px-6 py-4">
-                                Laptop
-                            </td>
-                            <td className="px-6 py-4">
-                                $2999
-                            </td>
-                            <td className="flex items-center space-x-3 px-6 py-4">
-                                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800" onClick={openEditUserModal}>
-                                    <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
-                                        Edit
-                                    </span>
-                                </Button>
-                                <EdituserModal open={editUserModalOpen} onClose={closeEditUserModal} />
+                                <EdituserModal open={editOrderModalOpen} onClose={closeEditOrderModal} />
                                 <MdLocalPrintshop className='w-5 h-5' />
                             </td>
                         </tr>

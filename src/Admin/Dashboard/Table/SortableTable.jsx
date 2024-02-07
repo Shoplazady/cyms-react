@@ -35,7 +35,7 @@ const SortableTable = () => {
                     onClick={openCreateUserModal}
                 >
                     <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-800 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
-                        Create order
+                        Add user
                     </span>
                 </Button>
                 {/* Modal create user */}

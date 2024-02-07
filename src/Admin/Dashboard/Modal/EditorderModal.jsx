@@ -1,39 +1,13 @@
-import React, { useState } from 'react';
-import { Dialog, DialogHeader, DialogBody, DialogFooter, Button, Select } from '@material-tailwind/react';
+import React from 'react';
+import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@material-tailwind/react';
 
-const CreateorderModal = ({ open, onClose }) => {
-
-    const [selectedOption, setSelectedOption] = useState(null);
-
-    const options = [
-        { value: 'united_states', label: 'United States' },
-        { value: 'canada', label: 'Canada' },
-        { value: 'france', label: 'France' },
-        
-    ];
-
-    const handleSelectChange = (selectedOption) => {
-        setSelectedOption(selectedOption);
-    };
-
+const EditorderModal = ({ open, onClose }) => {
     return (
         <Dialog open={open} handler={onClose} className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-opacity-5 text-gray-100 dark:text-gray-900">
             <div className="max-w-xl bg-gray-700 dark:bg-gray-100 p-8 rounded-md overflow-y-auto max-h-screen">
-                <DialogHeader>Add new order</DialogHeader>
+                <DialogHeader>Edit Order</DialogHeader>
                 <DialogBody className='text-gray-100 dark:text-gray-900'>
                     <form>
-                        <div class="mb-6">
-                            <label for="employee_name" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Employee name</label>
-                            <Select
-                                id="countries"
-                                value={selectedOption}
-                                onChange={handleSelectChange}
-                                options={options}
-                                isSearchable
-                                className="bg-gray-700 border border-gray-600 text-gray-50 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="Search for a country..."
-                            />
-                        </div>
                         <div class="grid gap-6 mb-6 md:grid-cols-2">
                             <div>
                                 <label for="first_name" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">First name</label>
@@ -78,7 +52,12 @@ const CreateorderModal = ({ open, onClose }) => {
                                     placeholder="" required />
                             </div>
                         </div>
-
+                        <div class="mb-6">
+                            <label for="email" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Email address</label>
+                            <input type="email" id="email"
+                                className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
+                                placeholder="john.doe@company.com" required />
+                        </div>
                         <div class="mb-6">
                             <label for="password" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Password</label>
                             <input type="password" id="password"
@@ -100,4 +79,4 @@ const CreateorderModal = ({ open, onClose }) => {
     );
 };
 
-export default CreateorderModal;
+export default EditorderModal;
