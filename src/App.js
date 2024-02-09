@@ -14,7 +14,7 @@ function App() {
     <DarkModeProvider>
       <Router>
         <Layout>
-          <div className='bg-stone-800 dark:bg-gray-100'>
+          <div className='bg-gray-800 dark:bg-gray-100'>
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} /> 

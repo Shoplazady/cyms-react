@@ -82,7 +82,7 @@ const OrderTable = () => {
                         <input
                             type="text"
                             id="table-search-users"
-                            className="block p-2 pl-10 text-sm text-gray-50 border border-stone-900 rounded-lg w-80 bg-stone-800 dark:bg-gray-100 dark:border-gray-400 dark:text-black"
+                            className="block p-2 pl-10 text-sm text-gray-50 border border-gray-700 rounded-lg w-80 bg-gray-800 dark:bg-gray-100 dark:border-gray-400 dark:text-black"
                             placeholder="Search for users"
                         />
                     </div>
@@ -189,7 +189,7 @@ const OrderTable = () => {
                     </tbody>
                 </table>
             </div>
-            <nav className="flex items-center flex-column flex-wrap md:flex-row justify-between p-4 bg-gray-700 dark:bg-gray-50" aria-label="Table navigation">
+            <nav className="flex items-center flex-column flex-wrap md:flex-row justify-between p-4 bg-gray-600 dark:bg-gray-50" aria-label="Table navigation">
                 <span className="text-sm font-medium text-gray-100 dark:text-gray-900 mb-4 md:mb-0 block w-full md:inline md:w-auto">
                     Showing <span className='text-gray-300 dark:text-gray-500'>1-10</span> of <span className='text-gray-300 dark:text-gray-500'>1000</span>
                 </span>

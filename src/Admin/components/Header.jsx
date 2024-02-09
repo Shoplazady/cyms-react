@@ -42,7 +42,7 @@ const Header = ({ onToggleSidebar }) => {
 
   return (
     <header>
-      <MaterialNavbar className={`max-w-full mx-auto px-2 duration-300 ease-linear sm:px-6 lg:px-8 bg-stone-900 border-0 shadow-lg dark:bg-gray-50`}>
+      <MaterialNavbar className={`max-w-full mx-auto px-2 duration-300 ease-linear sm:px-6 lg:px-8 bg-gray-900 border-0 shadow-lg dark:bg-gray-50`}>
         <div className={`relative flex h-16 items-center justify-between text-stone-300 dark:text-black`}>
           <div className="flex flex-1 items-center justify-center xl:items-stretch xl:justify-start">
             {/* Sidebar open when phone or tablet*/}
