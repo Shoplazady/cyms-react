@@ -26,7 +26,7 @@ const CreateorderModal = ({ open, onClose }) => {
     ]);
 
     const [showLinkInput, setShowLinkInput] = useState(false);
-    
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
 
     const handleIncrement = (id) => {
         setOrders((prevOrders) =>
@@ -56,8 +56,15 @@ const CreateorderModal = ({ open, onClose }) => {
     };
 
     const handleLinkLabelClick = (id) => {
-        setShowLinkInput(true);
+        // Toggle the visibility of the URL input field
+        setShowLinkInput((prevShowLinkInput) => !prevShowLinkInput);
+        setSelectedOrderId(id);
     };
+
+    const calculateTotal = () => {
+        return orders.reduce((total, order) => total + order.price * order.quantity, 0);
+    };
+
     return (
         <Dialog open={open} handler={onClose} className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-opacity-5 text-gray-100 dark:text-gray-900">
             <div className="lg:w-1/2 md:w-full bg-gray-700 dark:bg-gray-100 p-8 rounded-md overflow-y-auto max-h-screen">
@@ -105,7 +112,7 @@ const CreateorderModal = ({ open, onClose }) => {
                                         >
                                             <FaLink className="w-4 h-4" />
                                         </label>
-                                        {showLinkInput && (
+                                        {showLinkInput && selectedOrderId === order.id && (
                                             <input
                                                 type="text"
                                                 id={`link-${order.id}`}
@@ -198,13 +205,18 @@ const CreateorderModal = ({ open, onClose }) => {
                         </div>
                     </form>
                 </DialogBody >
-                <DialogFooter>
-                    <Button onClick={onClose} className="mr-1 bg-red-600 text-gray-100 font-medium hover:bg-red-700">
-                        <span>Cancel</span>
-                    </Button>
-                    <Button onClick={onClose} className='bg-green-500 font-medium text-gray-100 hover:bg-green-600'>
-                        <span>Confirm</span>
-                    </Button>
+                <DialogFooter className='flex justify-between items-center'>
+                    <div className="text-white dark:text-gray-900">
+                        Total Price: {calculateTotal().toFixed(2)}
+                    </div>
+                    <div>
+                        <Button onClick={onClose} className="mr-1 bg-red-600 text-gray-100 font-medium hover:bg-red-700">
+                            <span>Cancel</span>
+                        </Button>
+                        <Button onClick={onClose} className="bg-green-500 font-medium text-gray-100 hover:bg-green-600">
+                            <span>Confirm</span>
+                        </Button>
+                    </div>
                 </DialogFooter>
             </div >
         </Dialog >
