@@ -1,81 +1,225 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@material-tailwind/react';
+import Select from 'react-select';
+import { FaPlus, FaMinus, FaLink } from "react-icons/fa";
+import { RiDeleteBin6Fill } from "react-icons/ri";
+import { MdAttachFile } from "react-icons/md";
 
 const EditorderModal = ({ open, onClose }) => {
+
+    const [selectedOption, setSelectedOption] = useState(null);
+
+    const options = [
+        { value: 'united_states', label: 'United States' },
+        { value: 'canada', label: 'Canada' },
+        { value: 'france', label: 'France' },
+        { value: 'america', label: 'America' },
+
+    ];
+
+    const handleSelectChange = (selectedOption) => {
+        setSelectedOption(selectedOption);
+    };
+
+    const [orders, setOrders] = useState([
+        { id: 1, itemName: '', link: '', price: '', quantity: 1 },
+    ]);
+
+    const [showLinkInput, setShowLinkInput] = useState(false);
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
+
+    const handleIncrement = (id) => {
+        setOrders((prevOrders) =>
+            prevOrders.map((order) =>
+                order.id === id ? { ...order, quantity: order.quantity + 1 } : order
+            )
+        );
+    };
+
+    const handleDecrement = (id) => {
+        setOrders((prevOrders) =>
+            prevOrders.map((order) =>
+                order.id === id && order.quantity > 1
+                    ? { ...order, quantity: order.quantity - 1 }
+                    : order
+            )
+        );
+    };
+
+    const handleDeleteOrder = (id) => {
+        setOrders((prevOrders) => prevOrders.filter((order) => order.id !== id));
+    };
+
+    const handleAddOrder = () => {
+        const newOrder = { id: orders.length + 1, itemName: '', link: '', price: '', quantity: 1 };
+        setOrders([...orders, newOrder]);
+    };
+
+    const handleLinkLabelClick = (id) => {
+        // Toggle the visibility of the URL input field
+        setShowLinkInput((prevShowLinkInput) => !prevShowLinkInput);
+        setSelectedOrderId(id);
+    };
+
+    const calculateTotal = () => {
+        return orders.reduce((total, order) => total + order.price * order.quantity, 0);
+    };
+
     return (
         <Dialog open={open} handler={onClose} className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-opacity-5 text-gray-100 dark:text-gray-900">
-            <div className="max-w-xl bg-gray-700 dark:bg-gray-100 p-8 rounded-md overflow-y-auto max-h-screen">
-                <DialogHeader>Edit Order</DialogHeader>
-                <DialogBody className='text-gray-100 dark:text-gray-900'>
+            <div className="lg:w-1/2 md:w-full bg-gray-700 dark:bg-gray-100 p-8 rounded-md overflow-y-auto max-h-screen">
+                <DialogHeader>Add new order</DialogHeader>
+                <DialogBody className='text-gray-100 dark:text-gray-900 overflow-y-auto max-h-lg'>
                     <form>
-                        <div class="grid gap-6 mb-6 md:grid-cols-2">
-                            <div>
-                                <label for="first_name" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">First name</label>
-                                <input type="text"
-                                    id="first_name"
-                                    className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
-                                    placeholder="John" required />
-                            </div>
-                            <div>
-                                <label for="last_name" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Last name</label>
-                                <input type="text"
-                                    id="last_name"
-                                    className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg  w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
-                                    placeholder="Doe" required />
-                            </div>
-                            <div>
-                                <label for="company" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Company</label>
-                                <input type="text"
-                                    id="company"
-                                    className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
-                                    placeholder="Flowbite" required />
-                            </div>
-                            <div>
-                                <label for="phone" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Phone number</label>
-                                <input type="tel"
-                                    id="phone"
-                                    className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
-                                    placeholder="123-45-678" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" required />
-                            </div>
-                            <div>
-                                <label for="website" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Website URL</label>
-                                <input type="url"
-                                    id="website"
-                                    className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
-                                    placeholder="flowbite.com" required />
-                            </div>
-                            <div>
-                                <label for="visitors" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Unique visitors (per month)</label>
-                                <input type="number"
-                                    id="visitors"
-                                    className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
-                                    placeholder="" required />
-                            </div>
-                        </div>
                         <div class="mb-6">
-                            <label for="email" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Email address</label>
-                            <input type="email" id="email"
-                                className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
-                                placeholder="john.doe@company.com" required />
+                            <label for="employee_name" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Employee name</label>
+                            <Select
+                                id="em_name"
+                                value={selectedOption}
+                                onChange={handleSelectChange}
+                                options={options}
+                                isSearchable
+                                className="text-gray-900 dark:text-gray-800 bg-gray-700 border border-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Search for a Employee..."
+                            />
                         </div>
-                        <div class="mb-6">
-                            <label for="password" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Password</label>
-                            <input type="password" id="password"
-                                className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
-                                placeholder="•••••••••" required />
+                        <div className="mb-6">
+                            <label for="orderAdd" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Order Add</label>
+                            {orders.map((order) => (
+                                <div className="mb-6 space-y-4" key={order.id}>
+                                    {/* Row 1: Item Name and Picture */}
+                                    <div className="flex items-center">
+                                        <input
+                                            type="text"
+                                            id={`itemName-${order.id}`}
+                                            className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
+                                            placeholder="Enter item name"
+                                            value={order.itemName}
+                                            onChange={(e) =>
+                                                setOrders((prevOrders) =>
+                                                    prevOrders.map((o) =>
+                                                        o.id === order.id ? { ...o, itemName: e.target.value } : o
+                                                    )
+                                                )
+                                            }
+                                            required
+                                        />
+                                        {/* Add Link URL */}
+                                        <label
+                                            htmlFor={`link-${order.id}`}
+                                            className="ml-2 p-2 text-blue-500 hover:text-blue-700 cursor-pointer"
+                                            onClick={() => handleLinkLabelClick(order.id)}
+                                        >
+                                            <FaLink className="w-4 h-4" />
+                                        </label>
+                                        {showLinkInput && selectedOrderId === order.id && (
+                                            <input
+                                                type="text"
+                                                id={`link-${order.id}`}
+                                                className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg p-2.5 mt-2 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
+                                                placeholder="Enter URL"
+                                                value={order.link}
+                                                onChange={(e) =>
+                                                    setOrders((prevOrders) =>
+                                                        prevOrders.map((o) =>
+                                                            o.id === order.id ? { ...o, link: e.target.value } : o
+                                                        )
+                                                    )
+                                                }
+                                            />
+                                        )}
+
+                                        {/* Add  picture */}
+                                        <label
+                                            htmlFor={`file-${order.id}`}
+                                            className="ml-2 p-2 text-blue-500 hover:text-blue-700 cursor-pointer"
+                                        >
+                                            <MdAttachFile className="w-6 h-6" />
+                                            <input
+                                                type="file"
+                                                id={`file-${order.id}`}
+                                                className="hidden"
+                                                onChange={(e) =>
+                                                    setOrders((prevOrders) =>
+                                                        prevOrders.map((o) =>
+                                                            o.id === order.id ? { ...o, picture: e.target.files[0] } : o
+                                                        )
+                                                    )
+                                                }
+                                            />
+                                        </label>
+                                    </div>
+
+                                    {/* Row 2: Price and Quantity */}
+                                    <div className="relative flex items-center space-x-1 max-w-[8rem]" >
+                                        <input
+                                            type="text"
+                                            id={`price-${order.id}`}
+                                            className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-24 p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
+                                            placeholder="Enter price"
+                                            value={order.price}
+                                            onChange={(e) =>
+                                                setOrders((prevOrders) =>
+                                                    prevOrders.map((o) =>
+                                                        o.id === order.id ? { ...o, price: e.target.value } : o
+                                                    )
+                                                )
+                                            }
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDecrement(order.id)}
+                                            className="bg-gray-700 dark:bg-gray-100 dark:hover:bg-gray-200 dark:border-gray-300 hover:bg-gray-600 border border-gray-600 rounded-s-lg p-3 h-11 focus:ring-gray-700 dark:focus:ring-gray-100 focus:ring-2 focus:outline-none"
+                                        >
+                                            <FaMinus className="w-3 h-3 text-gray-50 dark:text-gray-900" />
+                                        </button>
+                                        <input
+                                            type="text"
+                                            id={`quantity-${order.id}`}
+                                            className="bg-gray-700 border-gray-300 h-11 text-center text-gray-50 text-sm focus:ring-blue-500 focus:border-blue-500 block w-6 py-2.5 dark:bg-gray-100 dark:border-gray-300 dark:placeholder-gray-200 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                            placeholder="Quantity"
+                                            value={order.quantity}
+                                            readOnly
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => handleIncrement(order.id)}
+                                            className="bg-gray-700 dark:bg-gray-100 dark:hover:bg-gray-200 dark:border-gray-300 hover:bg-gray-600 border border-gray-600 rounded-e-lg p-3 h-11 focus:ring-gray-700 dark:focus:ring-gray-100 focus:ring-2 focus:outline-none"
+                                        >
+                                            <FaPlus className="w-3 h-3 text-gray-50 dark:text-gray-900" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDeleteOrder(order.id)}
+                                            className="ml-2 p-2 text-red-500 hover:text-red-700"
+                                        >
+                                            <RiDeleteBin6Fill className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="flex justify-center mb-6">
+                            <FaPlus className="w-6 h-6" onClick={handleAddOrder} />
                         </div>
                     </form>
-                </DialogBody>
-                <DialogFooter>
-                    <Button onClick={onClose} className="mr-1 bg-red-600 text-gray-100 font-medium hover:bg-red-700">
-                        <span>Cancel</span>
-                    </Button>
-                    <Button onClick={onClose} className='bg-green-500 font-medium text-gray-100 hover:bg-green-600'>
-                        <span>Confirm</span>
-                    </Button>
+                </DialogBody >
+                <DialogFooter className='flex justify-between items-center'>
+                    <div className="text-white dark:text-gray-900">
+                        Total Price: {calculateTotal().toFixed(2)}
+                    </div>
+                    <div>
+                        <Button onClick={onClose} className="mr-1 bg-red-600 text-gray-100 font-medium hover:bg-red-700">
+                            <span>Cancel</span>
+                        </Button>
+                        <Button onClick={onClose} className="bg-green-500 font-medium text-gray-100 hover:bg-green-600">
+                            <span>Confirm</span>
+                        </Button>
+                    </div>
                 </DialogFooter>
-            </div>
-        </Dialog>
+            </div >
+        </Dialog >
     );
 };
 
