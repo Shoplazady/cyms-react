@@ -1,7 +1,20 @@
 import React from 'react';
 import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@material-tailwind/react';
+import { useAlert } from './../../components/AlertContext';
 
 const CreateuserModal = ({ open, onClose }) => {
+
+    const { showAlert } = useAlert();
+
+    const handleConfirm = () => {
+        
+        // Close the modal
+        onClose();
+    
+        // Show the alert
+        showAlert('success', 'User created successfully!');
+      };
+
     return (
         <Dialog open={open} handler={onClose} className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-opacity-5 text-gray-100 dark:text-gray-900">
             <div className="max-w-xl bg-gray-700 dark:bg-gray-100 p-8 rounded-md overflow-y-auto max-h-screen">
@@ -70,7 +83,7 @@ const CreateuserModal = ({ open, onClose }) => {
                     <Button onClick={onClose} className="mr-1 bg-red-600 text-gray-100 font-medium hover:bg-red-700">
                         <span>Cancel</span>
                     </Button>
-                    <Button onClick={onClose} className='bg-green-500 font-medium text-gray-100 hover:bg-green-600'>
+                    <Button onClick={handleConfirm} className='bg-green-500 font-medium text-gray-100 hover:bg-green-600'>
                         <span>Confirm</span>
                     </Button>
                 </DialogFooter>
