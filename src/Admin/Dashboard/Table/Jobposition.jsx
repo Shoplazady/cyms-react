@@ -1,33 +1,31 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AiOutlineSearch, AiFillDashboard } from 'react-icons/ai';
-import { FaArrowsUpDown } from "react-icons/fa6";
-import { MdLocalPrintshop, MdOutlineKeyboardArrowRight } from "react-icons/md";
+import { MdOutlineKeyboardArrowRight } from "react-icons/md";
+import { RiDeleteBin6Fill } from "react-icons/ri";
 import { FiEdit } from "react-icons/fi";
 import { Button } from '@material-tailwind/react';
-import CreateorderModal from './../Modal/CreateorderModal';
-import EdituserModal from './../Modal/EditorderModal';
-import DetailorderModal from './../Modal/DetailorderModal';
+import CreatejobModal from './../Modal/CreatejobModal';
+import EditjobModal from './../Modal/EditjobModal';
+import DeletejobModal from '../Modal/DeletejobModal';
 
+const JobTable = () => {
 
-const OrderTable = () => {
+    const [createJobModalOpen, setCreateJobModalOpen] = useState(false);
+    const [editJobModalOpen, setEditJobModalOpen] = useState(false);
+    const [deleteJobModalOpen , setDeleteJobModalOpen] = useState(false);
 
-    const [createOrderModalOpen, setCreateOrderModalOpen] = useState(false);
-    const [editOrderModalOpen, setEditOrderModalOpen] = useState(false);
-    const [detailOrderModalOpen, setDetailOrderModalOpen] = useState(false);
+    const openCreateJobModal = () => setCreateJobModalOpen(true);
+    const closeCreateJobModal = () => setCreateJobModalOpen(false);
 
-    const openCreateOrderModal = () => setCreateOrderModalOpen(true);
-    const closeCreateOrderModal = () => setCreateOrderModalOpen(false);
+    const openEditJobModal = () => setEditJobModalOpen(true);
+    const closeEditJobModal = () => setEditJobModalOpen(false);
 
-    const openEditOrderModal = () => setEditOrderModalOpen(true);
-    const closeEditOrderModal = () => setEditOrderModalOpen(false);
-
-    const openDetailOrderModal = () => setDetailOrderModalOpen(true);
-    const closeDetailOrderModal = () => setDetailOrderModalOpen(false);
+    const openDeleteJobModal = () => setDeleteJobModalOpen(true);
+    const closeDeleteJobModal = () => setDeleteJobModalOpen(false);
 
     return (
-
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <div class="relative overflow-x-auto shadow-md sm:rounded-lg" >
 
             <nav className="flex p-3" aria-label="Breadcrumb">
                 <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
@@ -40,7 +38,7 @@ const OrderTable = () => {
                     <li>
                         <div class="flex items-center">
                             < MdOutlineKeyboardArrowRight className='w-6 h-6 text-gray-300' />
-                            <h6 class="ms-1 text-sm font-medium text-gray-50 hover:text-blue-600 md:ms-2 dark:text-gray-900 dark:hover:text-blue-600">Order</h6>
+                            <h6 class="ms-1 text-sm font-medium text-gray-50 hover:text-blue-600 md:ms-2 dark:text-gray-900 dark:hover:text-blue-600">Job position</h6>
                         </div>
                     </li>
                 </ol>
@@ -51,14 +49,14 @@ const OrderTable = () => {
                 text-sm font-medium text-gray-100 rounded-lg group bg-gradient-to-br
                  from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-gray-900 
                  dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
-                    onClick={openCreateOrderModal}
+                    onClick={openCreateJobModal}
                 >
                     <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-800 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
-                        Create order
+                        Add Job
                     </span>
                 </Button>
                 {/* Modal create user */}
-                <CreateorderModal open={createOrderModalOpen} onClose={closeCreateOrderModal} />
+                <CreatejobModal open={createJobModalOpen} onClose={closeCreateJobModal} />
                 {/* Search input on the right */}
                 <div className="flex items-center">
                     <label htmlFor="table-search" className="sr-only text-black">
@@ -72,7 +70,7 @@ const OrderTable = () => {
                             type="text"
                             id="table-search-users"
                             className="block p-2 pl-10 text-sm text-gray-50 border border-gray-700 rounded-lg w-80 bg-gray-800 dark:bg-gray-100 dark:border-gray-400 dark:text-black"
-                            placeholder="Search for users"
+                            placeholder="Search for category"
                         />
                     </div>
                 </div>
@@ -97,31 +95,7 @@ const OrderTable = () => {
                                 No.
                             </th>
                             <th scope="col" class="px-6 py-3">
-                                Employee name
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                <div className="flex items-center">
-                                    Order detail
-                                    <FaArrowsUpDown className='w-3 h-3 ms-1.5' />
-                                </div>
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                <div className="flex items-center">
-                                    Date create
-                                    <FaArrowsUpDown className='w-3 h-3 ms-1.5' />
-                                </div>
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                <div className="flex items-center">
-                                    Status
-                                    <FaArrowsUpDown className='w-3 h-3 ms-1.5' />
-                                </div>
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                <div className="flex items-center">
-                                    Price
-                                    <FaArrowsUpDown className='w-3 h-3 ms-1.5' />
-                                </div>
+                                Category name
                             </th>
                             <th scope="col" class="px-6 py-3">
                                 <span className="sr-only">Tool</span>
@@ -146,33 +120,23 @@ const OrderTable = () => {
                                 10005578
                             </td>
                             <th scope="row" className="px-6 py-4 font-medium text-gray-200 whitespace-nowrap dark:text-gray-900">
-                                John wick
+                                <div className="flex items-center ">
+                                    Thai name
+                                    <FiEdit
+                                        className='hover:text-blue-500 ms-1.5'
+                                        onClick={openEditJobModal} />
+                                </div>
+                                <EditjobModal open={editJobModalOpen} onClose={closeEditJobModal} />
                             </th>
-                            <td className="flex items-center justify-between px-6 py-4">
-                                Order detail
-                                <FiEdit 
-                                className='hover:text-blue-500'
-                                onClick={openDetailOrderModal} />
-                                <DetailorderModal open={detailOrderModalOpen} onClose={closeDetailOrderModal} />
-                            </td>
                             <td className="px-6 py-4">
-                                15/5/67
-                            </td>
-                            <td className="px-6 py-4">
-                                Laptop
-                            </td>
-                            <td className="px-6 py-4">
-                                $2999
-                            </td>
-                            <td className="flex items-center space-x-3 px-6 py-4">
                                 <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
-                                    onClick={openEditOrderModal}>
+                                onClick={openDeleteJobModal}
+                                >
                                     <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
-                                        Edit
+                                        <RiDeleteBin6Fill />
                                     </span>
                                 </Button>
-                                <EdituserModal open={editOrderModalOpen} onClose={closeEditOrderModal} />
-                                <MdLocalPrintshop className='w-5 h-5' />
+                                <DeletejobModal open={deleteJobModalOpen} onClose={closeDeleteJobModal} />
                             </td>
                         </tr>
                     </tbody>
@@ -215,9 +179,7 @@ const OrderTable = () => {
                 </ul>
             </nav>
         </div>
-
-
     );
 }
 
-export default OrderTable;
+export default JobTable;

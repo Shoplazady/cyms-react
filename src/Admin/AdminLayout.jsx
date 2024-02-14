@@ -5,6 +5,8 @@ import Sidebar from './components/Sidebar';
 import AdminDashboard from './Dashboard/AdminDashboard';
 import UserManage from './Dashboard/User';
 import Ordertable from './Dashboard/Table/Ordertable';
+import Category from './Dashboard/Table/Category';
+import JobTable from './Dashboard/Table/Jobposition';
 
 const AdminLayout = () => {
 
@@ -27,6 +29,9 @@ const AdminLayout = () => {
                   <Route path="admin/" element={<AdminDashboard />} />
                   <Route path='admin/User' element={<UserManage />} />
                   <Route path="admin/Order" element={<Ordertable />} />
+                  <Route path="admin/category" element={<Category />} />
+                  <Route path="admin/job" element={<JobTable />} />
+
                 </Routes>
               </div>
             </main>

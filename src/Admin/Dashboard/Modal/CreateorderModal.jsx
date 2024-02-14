@@ -4,8 +4,20 @@ import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@materia
 import { FaPlus, FaMinus, FaLink } from "react-icons/fa";
 import { RiDeleteBin6Fill } from "react-icons/ri";
 import { MdAttachFile } from "react-icons/md";
+import { useAlert } from './../../components/AlertContext';
 
 const CreateorderModal = ({ open, onClose }) => {
+
+    const { showAlert } = useAlert();
+
+    const handleConfirm = () => {
+        
+        // Close the modal
+        onClose();
+    
+        // Show the alert
+        showAlert('success', 'Order created successfully!');
+      };
 
     const [selectedOption, setSelectedOption] = useState(null);
 
@@ -213,7 +225,7 @@ const CreateorderModal = ({ open, onClose }) => {
                         <Button onClick={onClose} className="mr-1 bg-red-600 text-gray-100 font-medium hover:bg-red-700">
                             <span>Cancel</span>
                         </Button>
-                        <Button onClick={onClose} className="bg-green-500 font-medium text-gray-100 hover:bg-green-600">
+                        <Button onClick={handleConfirm} className="bg-green-500 font-medium text-gray-100 hover:bg-green-600">
                             <span>Confirm</span>
                         </Button>
                     </div>

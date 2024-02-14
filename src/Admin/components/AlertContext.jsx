@@ -19,17 +19,18 @@ export const AlertProvider = ({ children }) => {
         <AlertContext.Provider value={{ showAlert, hideAlert }}>
             {children}
             {alert && (
-                // Render your alert component here using the alert state
                 <div
                     id="custom-alert"
                     className={`fixed top-4 right-4 z-50 flex items-center p-4 text-green-800 border-t-4 border-green-300 bg-green-50`}
                     role="alert"
                 >
-                    {alert.message}
+                    <div className="ms-3 text-sm font-medium">
+                        {alert.message}
+                    </div>
                     <button
                         type="button"
                         onClick={() => hideAlert()}
-                        className="ml-auto p-2 text-green-500 hover:text-green-700 hover:bg-green-100"
+                        className="ms-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-green-400 p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8"
                     >
                         <IoCloseSharp className='w-6 h-6' />
                     </button>
