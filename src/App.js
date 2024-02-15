@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DarkModeProvider } from './hooks/useDarkMode';
 import MainContent from './Components/MainContent';
 import Login from './Components/pages/Login';
+import Createorder from './Components/pages/Createorder';
 import Register from './Components/pages/Register';
 import Layout from './Components/Layout';
 import { AlertProvider } from './Admin/components/AlertContext';
@@ -14,14 +15,14 @@ function App() {
   return (
     <DarkModeProvider>
       <Router>
-        {/* Wrap the Layout with the AlertProvider */}
         <AlertProvider>
           <Layout>
-            <div className='bg-gray-800 dark:bg-gray-100'>
+            <div className=''>
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} /> 
                 <Route path="/" element={<MainContent />} />
+                <Route path="/create" element={<Createorder />} />
               </Routes>
             </div>
           </Layout>

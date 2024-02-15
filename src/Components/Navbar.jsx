@@ -44,7 +44,7 @@ const Navbar = () => {
 
     const navigation = [
         { name: 'Home', href: '/', icon: <FaHome />, current: false },
-        { name: 'Create', href: '#', icon: <FaPlus />, current: false },
+        { name: 'Create', href: '/create', icon: <FaPlus />, current: false },
         { name: 'Order List', href: '#', icon: <FaList />, current: false },
         { name: 'Order Status', href: '#', icon: <FaClipboard />, current: false },
         { name: 'Log in', href: '/login', icon: <FaSignInAlt />, current: false },
@@ -76,7 +76,7 @@ const Navbar = () => {
     );
 
     return (
-        <MaterialNavbar className={`max-w-full px-2 sm:px-6 lg:px-8 bg-stone-900 border-0 shadow-lg dark:bg-stone-200`}>
+        <MaterialNavbar className={`max-w-full px-2 sm:px-6 lg:px-8 bg-stone-900 border-0 shadow-lg dark:bg-gray-200 duration-300 ease-linear`}>
             <div className={`relative flex h-16 items-center justify-between text-stone-300 dark:text-black`}>
                 <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                     {/* Mobile menu button - top left */}
@@ -105,7 +105,7 @@ const Navbar = () => {
                                 <Link
                                     key={item.name}
                                     to={item.href}
-                                    className={`flex items-center rounded-md px-3 py-2 text-sm font-medium dark:text-black ${item.current ? 'bg-gray-900 text-white' : 'text-gray-100 hover:bg-gray-700 hover:text-white'}`}
+                                    className={`flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-50 dark:text-black hover:bg-stone-700 dark:hover:bg-gray-300`}
                                     aria-current={item.current ? 'page' : undefined}
                                 >
                                     {item.icon && React.cloneElement(item.icon, { className: 'h-5 w-5 mr-2' })}
@@ -116,7 +116,6 @@ const Navbar = () => {
                     </div>
                 </div>
                 <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-
                     {/* Dark mode switch */}
                     <label className="flex items-center gap-x-2 cursor-pointer">
                         {isDarkMode ? <IoMdMoon className="w-5 h-5" style={{ marginRight: '8px' }} /> : <IoMdSunny className="w-5 h-5" style={{ marginRight: '8px' }} />}
