@@ -21,16 +21,22 @@ export const AlertProvider = ({ children }) => {
             {alert && (
                 <div
                     id="custom-alert"
-                    className={`fixed top-4 right-4 z-50 flex items-center p-4 text-green-800 border-t-4 border-green-300 bg-green-50`}
+                    className={`fixed top-4 right-4 z-50 flex items-center p-4 text-sm font-medium rounded-lg ${alert.type === 'success' ?
+                            'border-t-4 border-green-300 bg-green-50 text-green-800' :
+                            'border-t-4 border-red-300 bg-red-50 text-red-800'
+                        }`}
                     role="alert"
                 >
-                    <div className="ms-3 text-sm font-medium">
+                    <div className="ms-3">
                         {alert.message}
                     </div>
                     <button
                         type="button"
                         onClick={() => hideAlert()}
-                        className="ms-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-green-400 p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8"
+                        className={`ms-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 ${alert.type === 'success' ?
+                                'focus:ring-green-400 bg-green-50 text-green-500 hover:bg-green-200' :
+                                'focus:ring-red-400 bg-red-50 text-red-500 hover:bg-red-200'
+                            } inline-flex items-center justify-center h-8 w-8`}
                     >
                         <IoCloseSharp className='w-6 h-6' />
                     </button>

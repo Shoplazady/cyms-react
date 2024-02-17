@@ -1,10 +1,11 @@
 const express = require('express');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
-
+const cors = require('cors');
 const app = express();
+const PORT = 3001;
 
-// Middleware
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -24,42 +25,43 @@ db.connect((err) => {
     }
 });
 
-// Your API endpoint for handling registration
-app.post('/api/register', (req, res) => {
-    const {
-        first_name,
-        last_name,
-        position,
-        agency,
-        tel_num,
-        email,
-        password,
-    } = req.body;
-
-    console.log('Received registration request:', req.body);
-
-    // Insert data into the users table
-    const query = `
-    INSERT INTO users (first_name, last_name, position, agency, tel_num, email, password, level, date_create)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
-  `;
-
-    db.query(
-        query,
-        [first_name, last_name, position, agency, tel_num, email, password, '1'], // '1' for default level, adjust as needed
-        (err, results) => {
-            if (err) {
-                console.error('Error inserting data into the database:', err);
-                res.status(500).json({ error: 'Internal Server Error' });
+const queryPromise = (sql, values) => {
+    return new Promise((resolve, reject) => {
+        db.query(sql, values, (error, results, fields) => {
+            if (error) {
+                reject(error);
             } else {
-                console.log('Data inserted successfully');
-                res.json({ success: true });
+                resolve(results);
             }
+        });
+    });
+};
+
+// Your API endpoint for handling registration
+app.post('/api/register', async (req, res) => {
+    const { first_name, last_name, position, agency, tel_num, email, password } = req.body;
+
+    try {
+        // Check if the email already exists
+        const result = await queryPromise('SELECT * FROM users WHERE email = ?', [email]);
+        console.log('Result from database:', result);
+
+        if (!result || result.length === 0) {
+            // If the email is not registered, proceed with the registration
+            await queryPromise('INSERT INTO users (first_name, last_name, position, agency, tel_num, email, password, level, date_create) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())', [first_name, last_name, position, agency, tel_num, email, password, 1]);
+
+            res.status(201).json({ success: true, message: 'User registered successfully.' });
+        } else {
+            const existingUser = result[0];
+            console.log('Existing user:', existingUser);
+            return res.status(400).json({ error: 'Email is already registered.' });
         }
-    );
+    } catch (error) {
+        console.error('Error registering user:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
 });
 
-const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
