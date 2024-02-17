@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link , useNavigate  } from 'react-router-dom';
 import axios from 'axios';
 import { IoMdMail, IoIosCall } from "react-icons/io";
 import { FaUserAlt, FaBuilding } from "react-icons/fa";
@@ -11,6 +11,8 @@ import { useAlert } from '../../Admin/components/AlertContext';
 const Register = () => {
 
     const { showAlert } = useAlert();
+
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         first_name: '',
@@ -45,6 +47,9 @@ const Register = () => {
             if (response.status === 201) {
                 // Show success message
                 showAlert('success', 'User registered successfully!');
+
+                navigate('/login');
+
             } else {
                 // Show error message if request was not successful
                 showAlert('error', response.data.error || 'Failed to add data to the database.');
