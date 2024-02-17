@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { IoMdMoon, IoMdSunny, IoMdHelp } from "react-icons/io";
 import { FaUserEdit } from "react-icons/fa";
@@ -27,6 +27,15 @@ const Navbar = () => {
 
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+
+        console.log("Logging out..."); 
+        localStorage.removeItem('rememberedUser');
+        navigate('/login');
+    };
+
     const profileMenuItems = [
         {
             label: "Edit Profile",
@@ -39,6 +48,7 @@ const Navbar = () => {
         {
             label: "Sign Out",
             icon: FiLogOut,
+            onClick: handleLogout,
         },
     ];
 
@@ -155,9 +165,10 @@ const Navbar = () => {
                                 {/* Profile menu */}
                                 {isMenuOpen && (
                                     <MenuList className={`p-1 ${isDarkMode ? 'bg-neutral-100 text-stone-800' : 'bg-zinc-700 text-stone-100'}`}>
-                                        {profileMenuItems.map(({ label, icon }, key) => (
+                                        {profileMenuItems.map(({ label, icon, onClick }, key) => (
                                             <MenuItem
                                                 key={label}
+                                                onClick={onClick}
                                                 className={`flex items-center gap-2 rounded ${key === profileMenuItems.length - 1
                                                     ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
                                                     : ""
