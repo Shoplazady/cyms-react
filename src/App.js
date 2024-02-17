@@ -7,6 +7,7 @@ import Createorder from './Components/pages/Createorder';
 import Register from './Components/pages/Register';
 import Layout from './Components/Layout';
 import { AlertProvider } from './Admin/components/AlertContext';
+import { AuthProvider } from './Components/useAuth';
 import './styles/tailwind.css';
 
 
@@ -14,21 +15,28 @@ function App() {
   
   return (
     <DarkModeProvider>
-      <Router>
-        <AlertProvider>
-          <Layout>
-            <div className=''>
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} /> 
-                <Route path="/" element={<MainContent />} />
-                <Route path="/create" element={<Createorder />} />
-              </Routes>
-            </div>
-          </Layout>
-        </AlertProvider>
-      </Router>
-    </DarkModeProvider>
+    <Router>
+      <AlertProvider>
+        <AuthProvider>
+          <Routes>
+            <Route
+              path="/*"
+              element={
+                <Layout>
+                  <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/" element={<MainContent />} />
+                    <Route path="/create" element={<Createorder />} />
+                  </Routes>
+                </Layout>
+              }
+            />
+          </Routes>
+        </AuthProvider>
+      </AlertProvider>
+    </Router>
+  </DarkModeProvider>
   );
 }
 

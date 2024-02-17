@@ -2,6 +2,9 @@ const express = require('express');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 const app = express();
 const PORT = 3001;
 
@@ -61,6 +64,30 @@ app.post('/api/register', async (req, res) => {
         res.status(500).json({ error: 'Internal server error.' });
     }
 });
+
+// Your API endpoint for handling login
+app.post('/api/login', async (req, res) => {
+    const { email, password } = req.body;
+  
+    try {
+      // Check if the email and password match a user in the database
+      const result = await queryPromise('SELECT * FROM users WHERE email = ? AND password = ?', [email, password]);
+  
+      if (!result || result.length === 0) {
+        // If no matching user found, respond with an error
+        return res.status(401).json({ error: 'Invalid email or password.' });
+      }
+  
+      const userData = result[0];
+  
+      // Respond with the user data
+      res.status(200).json(userData);
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({ error: 'Internal server error.' });
+    }
+  });
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
