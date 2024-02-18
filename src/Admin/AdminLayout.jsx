@@ -7,17 +7,14 @@ import UserManage from './Dashboard/User';
 import Ordertable from './Dashboard/Table/Ordertable';
 import Category from './Dashboard/Table/Category';
 import JobTable from './Dashboard/Table/Jobposition';
-import { useAuth } from '../Components/useAuth';
 
 const AdminLayout = () => {
-  const { user } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  if (user && user.role === 'admin') {
     return (
       <div className="bg-gray-900 dark:bg-gray-50">
         <div className="flex h-screen overflow-hidden">
@@ -39,9 +36,6 @@ const AdminLayout = () => {
         </div>
       </div>
     );
-  } else {
-    return <Navigate to="/" />;
-  }
 };
 
 export default AdminLayout;

@@ -13,14 +13,13 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData) => {
-    const { first_name, last_name, level, email } = userData;
+    const { first_name, last_name, email } = userData;
+    
+    const role = userData.level === 3 ? 'admin' : 'user';
 
-    // Check if the user is an admin (level 3)
-    const role = level === 3 ? 'admin' : 'user';
+    setUser({ first_name, last_name, email, role });
 
-    setUser({ first_name, last_name, level, email, role });
-
-    localStorage.setItem('user', JSON.stringify({ first_name, last_name, level, email, role }));
+    localStorage.setItem('user', JSON.stringify({ first_name, last_name, email, role }));
   };
 
   const logout = () => {
