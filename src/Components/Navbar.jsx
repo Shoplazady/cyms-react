@@ -5,7 +5,7 @@ import { IoMdMoon, IoMdSunny, IoMdHelp } from "react-icons/io";
 import { FaUserEdit } from "react-icons/fa";
 import { IoNotifications } from "react-icons/io5";
 import { FiAlignJustify, FiArrowUp, FiLogOut } from "react-icons/fi";
-import { FaHome, FaPlus, FaList, FaClipboard, FaSignInAlt } from 'react-icons/fa';
+import { FaHome, FaPlus, FaList, FaClipboard } from 'react-icons/fa';
 import {
     Navbar as MaterialNavbar,
     MobileNav,
@@ -18,6 +18,7 @@ import {
     MenuItem,
     Avatar,
 } from "@material-tailwind/react";
+import { useAuth } from "./useAuth";
 
 const Navbar = () => {
 
@@ -27,12 +28,14 @@ const Navbar = () => {
 
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
+    const { user, logout } = useAuth();
+
     const navigate = useNavigate();
 
     const handleLogout = () => {
 
-        console.log("Logging out..."); 
-        localStorage.removeItem('rememberedUser');
+        console.log("Logging out...");
+        logout();
         navigate('/login');
     };
 
@@ -57,7 +60,6 @@ const Navbar = () => {
         { name: 'Create', href: '/create', icon: <FaPlus />, current: false },
         { name: 'Order List', href: '#', icon: <FaList />, current: false },
         { name: 'Order Status', href: '#', icon: <FaClipboard />, current: false },
-        { name: 'Log in', href: '/login', icon: <FaSignInAlt />, current: false },
     ];
 
     React.useEffect(() => {
@@ -144,57 +146,71 @@ const Navbar = () => {
                     <div className="flex items-center gap-x-1 ml-auto justify-end">
 
                         <div className="ml-3">
-                            {/* Profile avatar */}
-                            <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
-                                <MenuHandler>
-                                    <Button
-                                        variant="text"
-                                        color="blue-gray"
-                                        className="flex items-center gap-1 rounded-full py-0.5 pr-2 pl-0.5"
-                                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                    >
-                                        <Avatar
-                                            variant="circular"
-                                            alt="Your Name"
-                                            className="border border-gray-900 p-0.5 rounded-full"
-                                            style={{ width: '40px', height: '40px' }}
-                                            src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
-                                        />
-                                    </Button>
-                                </MenuHandler>
-                                {/* Profile menu */}
-                                {isMenuOpen && (
-                                    <MenuList className={`p-1 ${isDarkMode ? 'bg-neutral-100 text-stone-800' : 'bg-zinc-700 text-stone-100'}`}>
-                                        {profileMenuItems.map(({ label, icon, onClick }, key) => (
-                                            <MenuItem
-                                                key={label}
-                                                onClick={onClick}
-                                                className={`flex items-center gap-2 rounded ${key === profileMenuItems.length - 1
-                                                    ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
-                                                    : ""
-                                                    }`}
-                                            >
-                                                {React.createElement(icon, {
-                                                    className: `h-4 w-4 ${key === profileMenuItems.length - 1 ? "text-red-500" : ""
-                                                        }`,
-                                                    strokeWidth: 2,
-                                                })}
-                                                <Typography
-                                                    as="span"
-                                                    variant="small"
-                                                    className="font-normal"
-                                                    color={
-                                                        key === profileMenuItems.length - 1 ? "red" : "inherit"
-                                                    }
+                            {/* Profile avatar or login/signup buttons */}
+                            {user ? (
+                                // Profile avatar
+                                <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
+                                    <MenuHandler>
+                                        <Button
+                                            variant="text"
+                                            color="blue-gray"
+                                            className="flex items-center gap-1 rounded-full py-0.5 pr-2 pl-0.5"
+                                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                        >
+                                            <Avatar
+                                                variant="circular"
+                                                alt="Your Name"
+                                                className="border border-gray-900 p-0.5 rounded-full"
+                                                style={{ width: '40px', height: '40px' }}
+                                                src={require('../Components/images/avatar.png')}
+                                            />
+                                        </Button>
+                                    </MenuHandler>
+                                    {/* Profile menu */}
+                                    {isMenuOpen && (
+                                        <MenuList className={`p-1 ${isDarkMode ? 'bg-neutral-100 text-stone-800' : 'bg-zinc-700 text-stone-100'}`}>
+                                            {profileMenuItems.map(({ label, icon, onClick }, key) => (
+                                                <MenuItem
+                                                    key={label}
+                                                    onClick={onClick}
+                                                    className={`flex items-center gap-2 rounded ${key === profileMenuItems.length - 1
+                                                        ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
+                                                        : ""
+                                                        }`}
                                                 >
-                                                    {label}
-                                                </Typography>
-                                            </MenuItem>
-                                        ))}
-                                    </MenuList>
-                                )}
-                            </Menu>
+                                                    {React.createElement(icon, {
+                                                        className: `h-4 w-4 ${key === profileMenuItems.length - 1 ? "text-red-500" : ""
+                                                            }`,
+                                                        strokeWidth: 2,
+                                                    })}
+                                                    <Typography
+                                                        as="span"
+                                                        variant="small"
+                                                        className="font-normal"
+                                                        color={
+                                                            key === profileMenuItems.length - 1 ? "red" : "inherit"
+                                                        }
+                                                    >
+                                                        {label}
+                                                    </Typography>
+                                                </MenuItem>
+                                            ))}
+                                        </MenuList>
+                                    )}
+                                </Menu>
+                            ) : (
+                                // Login/Signup buttons
+                                <>
+                                    <Link to="/login" className="text-stone-300 hover:text-white dark:text-black">
+                                        Sign in
+                                    </Link>
+                                    <Link to="/register" className="ml-4 text-white font-medium bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-md text-sm">
+                                        Sign Up
+                                    </Link>
+                                </>
+                            )}
                         </div>
+
                     </div>
                 </div>
             </div>

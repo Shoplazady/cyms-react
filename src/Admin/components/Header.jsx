@@ -1,7 +1,8 @@
 import React from 'react';
 import { useDarkMode } from '../../hooks/useDarkMode';
+import { useNavigate } from 'react-router-dom';
 import { IoMdMoon, IoMdSunny, IoMdHelp } from "react-icons/io";
-import { FaUserEdit, FaUserAstronaut} from "react-icons/fa";
+import { FaUserEdit, FaUserAstronaut } from "react-icons/fa";
 import { IoNotifications } from "react-icons/io5";
 import { FiAlignJustify, FiLogOut } from "react-icons/fi";
 import {
@@ -14,8 +15,19 @@ import {
   MenuItem,
   Avatar,
 } from "@material-tailwind/react";
+import { useAuth } from '../../Components/useAuth';
 
 const Header = ({ onToggleSidebar }) => {
+
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+
+  const handleLogout = () => {
+    console.log("Logging out...");
+    logout();
+    navigate('/login');
+  };
 
   const { isDarkMode, toggleDarkMode } = useDarkMode();
 
@@ -37,6 +49,7 @@ const Header = ({ onToggleSidebar }) => {
     {
       label: "Sign Out",
       icon: FiLogOut,
+      onClick: handleLogout,
     },
   ];
 
@@ -51,8 +64,8 @@ const Header = ({ onToggleSidebar }) => {
                 variant="text"
                 className="p-2"
                 onClick={onToggleSidebar}
-              >                
-                  <FiAlignJustify className="mx-auto h-8 w-8 text-white dark:text-black" />
+              >
+                <FiAlignJustify className="mx-auto h-8 w-8 text-white dark:text-black" />
               </Button>
             </div>
           </div>
@@ -90,16 +103,17 @@ const Header = ({ onToggleSidebar }) => {
                         alt="Your Name"
                         className="border border-gray-900 p-0.5 rounded-full"
                         style={{ width: '40px', height: '40px' }}
-                        src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
+                        src={require('../../Components/images/avatar.png')}
                       />
                     </Button>
                   </MenuHandler>
                   {/* Profile menu */}
                   {isMenuOpen && (
                     <MenuList className="p-1 space-y-2 border-0 font-medium bg-zinc-700 dark:bg-neutral-100 text-stone-100 dark:text-stone-900">
-                      {profileMenuItems.map(({ label, icon }, key) => (
+                      {profileMenuItems.map(({ label, icon, onClick }, key) => (
                         <MenuItem
                           key={label}
+                          onClick={onClick}
                           className={`flex items-center gap-2 rounded ${key === profileMenuItems.length - 1
                             ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
                             : ""

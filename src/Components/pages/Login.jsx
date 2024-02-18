@@ -31,20 +31,26 @@ const Login = () => {
 
       const userData = await response.json();
 
-      // Remember the user only if the "Remember Me" checkbox is checked
+
       if (rememberMe) {
-        // Save the user data to localStorage
-        localStorage.setItem('rememberedUser', JSON.stringify(userData));
+
+        const { first_name, last_name, level, email } = userData;
+
+
+        localStorage.setItem('rememberedUser', JSON.stringify({ first_name, last_name, level, email }));
       }
 
-      // Update the auth context with the user data
+
       login(userData);
 
-      // Show success alert
       showAlert('success', 'Login successful.');
 
-      // Navigate to the home page or any desired page
-      navigate('/');
+      if (userData.level === 1) {
+        navigate('/');
+      } else if (userData.level === 3) {
+        navigate('/admin');
+      }
+
     } catch (error) {
       console.error('Login failed:', error.message);
 

@@ -6,6 +6,7 @@ import Login from './Components/pages/Login';
 import Createorder from './Components/pages/Createorder';
 import Register from './Components/pages/Register';
 import Layout from './Components/Layout';
+import AuthGuard from './Components/AuthGuard';
 import { AlertProvider } from './Admin/components/AlertContext';
 import { AuthProvider } from './Components/useAuth';
 import './styles/tailwind.css';
@@ -24,7 +25,7 @@ function App() {
               element={
                 <Layout>
                   <Routes>
-                    <Route path="/login" element={<Login />} />
+                    <Route path="/login" element={<AuthGuard element={<Login />} />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/" element={<MainContent />} />
                     <Route path="/create" element={<Createorder />} />
