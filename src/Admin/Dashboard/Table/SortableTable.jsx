@@ -1,18 +1,12 @@
-import React, { useState } from 'react';
-import { IoIosArrowDown } from 'react-icons/io';
+import React, { useState, useEffect } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
-import {
-    Menu,
-    MenuHandler,
-    MenuList,
-    MenuItem,
-    Avatar,
-    Button,
-} from '@material-tailwind/react';
+import { Avatar, Button } from '@material-tailwind/react';
 import CreateuserModal from './../Modal/CreateuserModal';
 import EdituserModal from './../Modal/EdituserModal';
 
 const SortableTable = () => {
+
+    const [users, setUsers] = useState([]);
 
     const [createUserModalOpen, setCreateUserModalOpen] = useState(false);
     const [editUserModalOpen, setEditUserModalOpen] = useState(false);
@@ -23,15 +17,29 @@ const SortableTable = () => {
     const openEditUserModal = () => setEditUserModalOpen(true);
     const closeEditUserModal = () => setEditUserModalOpen(false);
 
-    return (
+    useEffect(() => {
+        
+        const fetchUsers = async () => {
+          try {
+            const response = await fetch('http://localhost:3001/api/users'); 
+            const data = await response.json();
+            setUsers(data);
+          } catch (error) {
+            console.error('Error fetching user data:', error);
+          }
+        };
+    
+        fetchUsers();
+      }, []);
 
+    return (
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-            {/* ... Other content ... */}
             <div className="flex items-center justify-between flex-column p-2 md:flex-row flex-wrap bg-gray-700 dark:bg-gray-50">
-                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden 
-                text-sm font-medium text-gray-100 rounded-lg group bg-gradient-to-br
-                 from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-gray-900 
-                 dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
+                <Button
+                    className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden 
+                    text-sm font-medium text-gray-100 rounded-lg group bg-gradient-to-br
+                     from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-gray-900 
+                     dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
                     onClick={openCreateUserModal}
                 >
                     <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-800 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
@@ -59,7 +67,7 @@ const SortableTable = () => {
                 </div>
             </div>
 
-            <div className='relative overflow-x-auto'>
+            <div className="relative overflow-x-auto">
                 <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     <thead className="text-xs text-gray-400 uppercase bg-gray-700 dark:bg-gray-200 dark:text-gray-700">
                         <tr>
@@ -90,56 +98,63 @@ const SortableTable = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="bg-gray-800 border-b border-gray-500 dark:bg-gray-50 dark:border-gray-300 hover:bg-gray-900 dark:hover:bg-gray-100">
-                            {/* ... Table row content ... */}
-                            <td className="w-4 p-4">
-                                <div className="flex items-center">
-                                    <input
-                                        id="checkbox-table-search-1"
-                                        type="checkbox"
-                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        {users.map((user, index) => (
+                            <tr
+                                key={index}
+                                className="bg-gray-800 border-b border-gray-500 dark:bg-gray-50 dark:border-gray-300 hover:bg-gray-900 dark:hover:bg-gray-100"
+                            >
+                                <td className="w-4 p-4">
+                                    <div className="flex items-center">
+                                        <input
+                                            id={`checkbox-table-search-${index}`}
+                                            type="checkbox"
+                                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                        />
+                                        <label htmlFor={`checkbox-table-search-${index}`} className="sr-only">
+                                            checkbox
+                                        </label>
+                                    </div>
+                                </td>
+                                <td className="flex items-center px-6 py-4 text-gray-100 whitespace-nowrap dark:text-gray-900">
+                                    <Avatar
+                                        variant="circular"
+                                        alt={`${user.first_name} ${user.last_name}`}
+                                        className="w-10 h-10 rounded-full"
+                                        style={{ width: '40px', height: '40px' }}
+                                        src={require('./../../../Components/images/avatar.png')}
                                     />
-                                    <label htmlFor="checkbox-table-search-1" className="sr-only">
-                                        checkbox
-                                    </label>
-                                </div>
-                            </td>
-                            <td className="flex items-center px-6 py-4 text-gray-100 whitespace-nowrap dark:text-gray-900">
-                                <Avatar
-                                    variant="circular"
-                                    alt="Your Name"
-                                    className="w-10 h-10 rounded-full"
-                                    style={{ width: '40px', height: '40px' }}
-                                    src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
-                                />
-                                <div className="ps-3">
-                                    <div className="text-base font-semibold">Neil Sims</div>
-                                    <div className="font-normal">neil.sims@flowbite.com</div>
-                                </div>
-                            </td>
-                            <td className="px-6 py-4 text-gray-100 whitespace-nowrap dark:text-gray-900">React Developer</td>
-                            <td className="px-6 py-4 text-gray-100 whitespace-nowrap dark:text-gray-900">
-                                <div className="flex items-center">
-                                    <div className="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Online
-                                </div>
-                            </td>
-                            <td className="px-6 py-4">
-                                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800" onClick={openEditUserModal}>
-                                    <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
-                                        Edit
-                                    </span>
-                                </Button>
-                                <EdituserModal open={editUserModalOpen} onClose={closeEditUserModal} />
-                            </td>
-                        </tr>
-                        
-
+                                    <div className="ps-3">
+                                        <div className="text-base font-semibold">
+                                            {`${user.first_name} ${user.last_name}`}
+                                        </div>
+                                        <div className="font-normal">{user.email}</div>
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4 text-gray-100 whitespace-nowrap dark:text-gray-900">{user.position}</td>
+                                <td className="px-6 py-4 text-gray-100 whitespace-nowrap dark:text-gray-900">
+                                    <div className="flex items-center">
+                                        <div className="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Online
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4">
+                                    <Button
+                                        className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
+                                        onClick={openEditUserModal}
+                                    >
+                                        <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
+                                            Edit
+                                        </span>
+                                    </Button>
+                                    <EdituserModal open={editUserModalOpen} onClose={closeEditUserModal} />
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>
             <nav className="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4 pb-4 ml-2 mr-2" aria-label="Table navigation">
                 <span className="text-sm font-medium text-gray-100 dark:text-gray-900 mb-4 md:mb-0 block w-full md:inline md:w-auto">
-                    Showing <span className='text-gray-300 dark:text-gray-500'>1-10</span> of <span className='text-gray-300 dark:text-gray-500'>1000</span>
+                    Showing <span className="text-gray-300 dark:text-gray-500">1-10</span> of <span className="text-gray-300 dark:text-gray-500">1000</span>
                 </span>
                 <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
                     <li>
@@ -152,16 +167,37 @@ const SortableTable = () => {
                     </li>
                     {/* ... Page links ... */}
                     <li>
-                        <a href="#" className="flex items-center justify-center px-3 h-8 leading-tight text-gray-100 bg-stone-800 border border-stone-700 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">1</a>
+                        <a
+                            href="#"
+                            className="flex items-center justify-center px-3 h-8 leading-tight text-gray-100 bg-stone-800 border border-stone-700 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black"
+                        >
+                            1
+                        </a>
                     </li>
                     <li>
-                        <a href="#" className="flex items-center justify-center px-3 h-8 leading-tight text-gray-100 bg-stone-800 border border-stone-700 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">2</a>
+                        <a
+                            href="#"
+                            className="flex items-center justify-center px-3 h-8 leading-tight text-gray-100 bg-stone-800 border border-stone-700 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black"
+                        >
+                            2
+                        </a>
                     </li>
                     <li>
-                        <a href="#" aria-current="page" className="flex items-center justify-center px-3 h-8 text-gray-100 bg-stone-800 border border-stone-700 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">3</a>
+                        <a
+                            href="#"
+                            aria-current="page"
+                            className="flex items-center justify-center px-3 h-8 text-gray-100 bg-stone-800 border border-stone-700 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black"
+                        >
+                            3
+                        </a>
                     </li>
                     <li>
-                        <a href="#" className="flex items-center justify-center px-3 h-8 leading-tight text-gray-100 bg-stone-800 border border-stone-700 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">4</a>
+                        <a
+                            href="#"
+                            className="flex items-center justify-center px-3 h-8 leading-tight text-gray-100 bg-stone-800 border border-stone-700 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black"
+                        >
+                            4
+                        </a>
                     </li>
                     <li>
                         <a
@@ -173,10 +209,8 @@ const SortableTable = () => {
                     </li>
                 </ul>
             </nav>
-            {/* ... Edit user modal ... */}
         </div>
-
     );
-}
+};
 
 export default SortableTable;
