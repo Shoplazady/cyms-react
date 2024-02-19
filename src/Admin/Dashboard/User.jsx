@@ -1,5 +1,4 @@
-//User.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import SortableTable from './Table/SortableTable';
 
@@ -7,6 +6,14 @@ import { AiFillDashboard } from "react-icons/ai";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 const UserManage = () => {
+    const [currentPage, setCurrentPage] = useState(1);
+
+    // Define the function for handling page changes
+    const handlePageChange = (page) => {
+        // Add logic for updating the current page
+        setCurrentPage(page);
+    };
+
     return (
         <>
             <nav className="flex p-3" aria-label="Breadcrumb">
@@ -28,7 +35,8 @@ const UserManage = () => {
 
             <Outlet />
 
-            <SortableTable />
+            {/* Pass the handlePageChange function as a prop to SortableTable */}
+            <SortableTable onPageChange={handlePageChange} />
         </>
     );
 };

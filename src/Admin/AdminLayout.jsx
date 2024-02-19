@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import AdminHeader from './components/Header';
 import Sidebar from './components/Sidebar';
 import AdminDashboard from './Dashboard/AdminDashboard';
@@ -21,7 +21,7 @@ const AdminLayout = () => {
           <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
           <div className="flex flex-1 flex-col w-full">
             <AdminHeader onToggleSidebar={handleToggleSidebar} />
-            <main className='flex-1 h-full shadow-inner bg-gray-800 dark:bg-stone-100 duration-300 ease-linear'>
+            <main className='flex-1 h-full shadow-inner bg-gray-800 dark:bg-stone-100 duration-300 ease-linear overflow-y-auto'>
               <div className="mx-auto p-2 md:p-4 2xl:p-6">
                 <Routes>
                   <Route path="/admin/" element={<AdminDashboard />} />
