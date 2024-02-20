@@ -275,6 +275,33 @@ app.post('/api/admin/addjob', async (req, res) => {
     }
 });
 
+app.put('/api/admin/job/updateStatus/:jobId', async (req, res) => {
+    try {
+        const jobId = req.params.jobId;
+
+        // Fetch the current job status from the database
+        const currentStatusQuery = await queryPromise('SELECT job_status FROM job_position WHERE job_id = ?', [jobId]);
+
+        if (!currentStatusQuery || currentStatusQuery.length === 0) {
+            return res.status(404).json({ error: 'Job not found.' });
+        }
+
+        const currentStatus = currentStatusQuery[0].job_status;
+
+        // Toggle the status
+        const updatedStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+
+        // Update the job status in the database
+        const updateQuery = 'UPDATE job_position SET job_status = ? WHERE job_id = ?';
+        await queryPromise(updateQuery, [updatedStatus, jobId]);
+
+        res.status(200).json({ success: true, message: 'Job status updated successfully.', updatedStatus });
+    } catch (error) {
+        console.error('Error updating job status:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

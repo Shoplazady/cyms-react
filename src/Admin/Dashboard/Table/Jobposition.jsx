@@ -8,6 +8,7 @@ import { Button } from '@material-tailwind/react';
 import CreatejobModal from './../Modal/CreatejobModal';
 import EditjobModal from './../Modal/EditjobModal';
 import DeletejobModal from '../Modal/DeletejobModal';
+import ActivejobModal from '../Modal/ActivejobModal';
 
 const JobTable = () => {
 
@@ -16,7 +17,9 @@ const JobTable = () => {
     const [createJobModalOpen, setCreateJobModalOpen] = useState(false);
     const [editJobModalOpen, setEditJobModalOpen] = useState(false);
     const [deleteJobModalOpen, setDeleteJobModalOpen] = useState(false);
-    
+    const [activeJobModalOpen, setActiveJobModalOpen] = useState(false);
+    const [selectedJob, setSelectedJob] = useState({ jobId: null, jobStatus: null });
+
 
     const openCreateJobModal = () => setCreateJobModalOpen(true);
     const closeCreateJobModal = () => setCreateJobModalOpen(false);
@@ -26,6 +29,16 @@ const JobTable = () => {
 
     const openDeleteJobModal = () => setDeleteJobModalOpen(true);
     const closeDeleteJobModal = () => setDeleteJobModalOpen(false);
+
+    const openActiveJobModal = (jobId, jobStatus) => {
+        setSelectedJob({ jobId, jobStatus });
+        setActiveJobModalOpen(true);
+    };
+
+    const closeActiveJobModal = () => {
+        setSelectedJob({ jobId: null, jobStatus: null });
+        setActiveJobModalOpen(false);
+    };
 
     useEffect(() => {
         const fetchJobs = async () => {
@@ -138,7 +151,7 @@ const JobTable = () => {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center ">
-                                        {job.job_name}
+                                            {job.job_name}
                                             <FiEdit
                                                 className='hover:text-blue-500 ms-1.5'
                                                 onClick={openEditJobModal} />
@@ -153,7 +166,11 @@ const JobTable = () => {
                                                 <div className="h-2.5 w-2.5 rounded-full bg-red-500 me-2"></div>
                                             )}
                                             {job.job_status}
-                                            <FiEdit className='hover:text-blue-500 ms-1.5' />
+                                            <FiEdit
+                                                className='hover:text-blue-500 ms-1.5'
+                                                onClick={() => openActiveJobModal(job.job_id, job.job_status)}
+                                            />
+                                            <ActivejobModal open={activeJobModalOpen} onClose={closeActiveJobModal} />
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
