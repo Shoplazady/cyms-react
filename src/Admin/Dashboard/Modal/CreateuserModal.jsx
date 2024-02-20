@@ -39,7 +39,6 @@ const CreateuserModal = ({ open, onClose }) => {
 
             showAlert('success', 'User created successfully!');
 
-            // Handle success or display error messages
         } catch (error) {
             console.error('Error:', error);
 

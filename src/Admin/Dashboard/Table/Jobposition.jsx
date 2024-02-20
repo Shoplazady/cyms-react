@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AiOutlineSearch, AiFillDashboard } from 'react-icons/ai';
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
@@ -11,9 +11,12 @@ import DeletejobModal from '../Modal/DeletejobModal';
 
 const JobTable = () => {
 
+    const [jobs, setJobs] = useState([])
+    const [totalJobs, setTotalJobs] = useState(0);
     const [createJobModalOpen, setCreateJobModalOpen] = useState(false);
     const [editJobModalOpen, setEditJobModalOpen] = useState(false);
-    const [deleteJobModalOpen , setDeleteJobModalOpen] = useState(false);
+    const [deleteJobModalOpen, setDeleteJobModalOpen] = useState(false);
+    
 
     const openCreateJobModal = () => setCreateJobModalOpen(true);
     const closeCreateJobModal = () => setCreateJobModalOpen(false);
@@ -23,6 +26,21 @@ const JobTable = () => {
 
     const openDeleteJobModal = () => setDeleteJobModalOpen(true);
     const closeDeleteJobModal = () => setDeleteJobModalOpen(false);
+
+    useEffect(() => {
+        const fetchJobs = async () => {
+            try {
+                const response = await fetch(`http://localhost:3001/api/admin/job`);
+
+                const data = await response.json();
+                setJobs(data.jobs);
+                setTotalJobs(data.totalJobs);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+        fetchJobs();
+    }, [jobs]);
 
     return (
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg" >
@@ -92,10 +110,10 @@ const JobTable = () => {
                                 </div>
                             </th>
                             <th scope="col" class="px-6 py-3">
-                                No.
+                                Position name
                             </th>
                             <th scope="col" class="px-6 py-3">
-                                Category name
+                                Status
                             </th>
                             <th scope="col" class="px-6 py-3">
                                 <span className="sr-only">Tool</span>
@@ -103,80 +121,67 @@ const JobTable = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="bg-gray-800 border-b border-gray-700 dark:bg-white dark:border-gray-200">
-                            <td className="w-4 p-4">
-                                <div className="flex items-center">
-                                    <input
-                                        id="checkbox-table-search-1"
-                                        type="checkbox"
-                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                    />
-                                    <label htmlFor="checkbox-table-search-1" className="sr-only">
-                                        checkbox
-                                    </label>
-                                </div>
-                            </td>
-                            <td className="px-6 py-4">
-                                10005578
-                            </td>
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-200 whitespace-nowrap dark:text-gray-900">
-                                <div className="flex items-center ">
-                                    Thai name
-                                    <FiEdit
-                                        className='hover:text-blue-500 ms-1.5'
-                                        onClick={openEditJobModal} />
-                                </div>
-                                <EditjobModal open={editJobModalOpen} onClose={closeEditJobModal} />
-                            </th>
-                            <td className="px-6 py-4">
-                                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
-                                onClick={openDeleteJobModal}
-                                >
-                                    <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
-                                        <RiDeleteBin6Fill />
-                                    </span>
-                                </Button>
-                                <DeletejobModal open={deleteJobModalOpen} onClose={closeDeleteJobModal} />
-                            </td>
-                        </tr>
+                        {jobs.length > 0 ? (
+                            jobs.map((job, index) => (
+                                <tr className="bg-gray-800 border-b border-gray-700 dark:bg-white dark:border-gray-200">
+                                    <td className="w-4 p-4">
+                                        <div className="flex items-center">
+                                            <input
+                                                id="checkbox-table-search-1"
+                                                type="checkbox"
+                                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                            />
+                                            <label htmlFor="checkbox-table-search-1" className="sr-only">
+                                                checkbox
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center ">
+                                        {job.job_name}
+                                            <FiEdit
+                                                className='hover:text-blue-500 ms-1.5'
+                                                onClick={openEditJobModal} />
+                                        </div>
+                                        <EditjobModal open={editJobModalOpen} onClose={closeEditJobModal} />
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center">
+                                            {job.job_status === 'Active' ? (
+                                                <div className="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div>
+                                            ) : (
+                                                <div className="h-2.5 w-2.5 rounded-full bg-red-500 me-2"></div>
+                                            )}
+                                            {job.job_status}
+                                            <FiEdit className='hover:text-blue-500 ms-1.5' />
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
+                                            onClick={openDeleteJobModal}
+                                        >
+                                            <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
+                                                <RiDeleteBin6Fill />
+                                            </span>
+                                        </Button>
+                                        <DeletejobModal open={deleteJobModalOpen} onClose={closeDeleteJobModal} />
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="5" className="text-center text-gray-500 dark:text-gray-400 py-4">
+                                    No users found.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>
             <nav className="flex items-center flex-column flex-wrap md:flex-row justify-between p-4 bg-gray-600 dark:bg-gray-50" aria-label="Table navigation">
                 <span className="text-sm font-medium text-gray-100 dark:text-gray-900 mb-4 md:mb-0 block w-full md:inline md:w-auto">
-                    Showing <span className='text-gray-300 dark:text-gray-500'>1-10</span> of <span className='text-gray-300 dark:text-gray-500'>1000</span>
+                    Showing job total <span className='text-gray-300 dark:text-gray-500'>{totalJobs}</span>
                 </span>
-                <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
-                    <li>
-                        <a
-                            href="#"
-                            className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-100 bg-gray-700 border border-stone-800 rounded-s-lg hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black"
-                        >
-                            Previous
-                        </a>
-                    </li>
-                    {/* ... Page links ... */}
-                    <li>
-                        <a href="#" className="flex items-center justify-center px-3 h-8 leading-tight text-gray-100 bg-gray-700 border border-gray-900 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">1</a>
-                    </li>
-                    <li>
-                        <a href="#" className="flex items-center justify-center px-3 h-8 leading-tight text-gray-100 bg-gray-700 border border-gray-900 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">2</a>
-                    </li>
-                    <li>
-                        <a href="#" aria-current="page" className="flex items-center justify-center px-3 h-8 text-gray-100 bg-gray-700 border border-gray-900 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">3</a>
-                    </li>
-                    <li>
-                        <a href="#" className="flex items-center justify-center px-3 h-8 leading-tight text-gray-100 bg-gray-700 border border-gray-900 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">4</a>
-                    </li>
-                    <li>
-                        <a
-                            href="#"
-                            className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-100 bg-gray-700 border border-gray-900 rounded-e-lg hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black"
-                        >
-                            Next
-                        </a>
-                    </li>
-                </ul>
             </nav>
         </div>
     );

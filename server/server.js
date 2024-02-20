@@ -237,6 +237,44 @@ app.delete('/api/admin/deleteuser/:userId', async (req, res) => {
     }
 });
 
+app.get('/api/admin/job', async (req, res) => {
+    try {
+        
+        const result = await queryPromise('SELECT * FROM job_position');
+
+        
+        res.status(200).json({ jobs: result, totalJobs: result.length });
+    } catch (error) {
+        console.error('Error fetching job data:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+app.post('/api/admin/addjob', async (req, res) => {
+    try {
+        const { job_name, job_status } = req.body;
+
+        // Check if the job name is provided
+        const existingJob = await queryPromise('SELECT * FROM job_position WHERE job_name = ?', [job_name]);
+
+        if (existingJob && existingJob.length > 0) {
+            return res.status(400).json({ error: 'Job name already exists.' });
+        }
+
+        // Insert the job into the database
+        const result = await queryPromise('INSERT INTO job_position (job_name, job_status, job_create) VALUES (?, ?, NOW())', [job_name, job_status]);
+
+        if (result.affectedRows === 1) {
+            res.status(201).json({ success: true, message: 'Job created successfully.' });
+        } else {
+            res.status(500).json({ error: 'Error adding job position.' });
+        }
+    } catch (error) {
+        console.error('Error adding job position:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
