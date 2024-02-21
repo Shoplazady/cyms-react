@@ -44,8 +44,6 @@ const SortableTable = ({ usersPerPage, onPageChange, onSearchChange }) => {
         setDeleteModalOpen(false);
     };
 
-    
-
     useEffect(() => {
         const fetchUsers = async () => {
             try {

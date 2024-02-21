@@ -18,7 +18,8 @@ const JobTable = () => {
     const [editJobModalOpen, setEditJobModalOpen] = useState(false);
     const [deleteJobModalOpen, setDeleteJobModalOpen] = useState(false);
     const [activeJobModalOpen, setActiveJobModalOpen] = useState(false);
-    const [selectedJob, setSelectedJob] = useState({ jobId: null, jobStatus: null });
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [selectedJob, setSelectedJob] = useState(null);
 
 
     const openCreateJobModal = () => setCreateJobModalOpen(true);
@@ -30,13 +31,13 @@ const JobTable = () => {
     const openDeleteJobModal = () => setDeleteJobModalOpen(true);
     const closeDeleteJobModal = () => setDeleteJobModalOpen(false);
 
-    const openActiveJobModal = (jobId, jobStatus) => {
-        setSelectedJob({ jobId, jobStatus });
+    const openActiveJobModal = (job) => {
+        setSelectedJob(job);
         setActiveJobModalOpen(true);
     };
 
     const closeActiveJobModal = () => {
-        setSelectedJob({ jobId: null, jobStatus: null });
+        setSelectedJob(null);
         setActiveJobModalOpen(false);
     };
 
@@ -54,6 +55,24 @@ const JobTable = () => {
         };
         fetchJobs();
     }, [jobs]);
+
+    const handleRowSelect = (rowId) => {
+        const updatedSelectedRows = [...selectedRows];
+    
+        if (updatedSelectedRows.includes(rowId)) {
+            
+            const index = updatedSelectedRows.indexOf(rowId);
+            updatedSelectedRows.splice(index, 1);
+        } else {
+            
+            updatedSelectedRows.push(rowId);
+        }
+    
+        setSelectedRows(updatedSelectedRows);
+        
+        const selectedJob = jobs.find((job) => job.id === rowId);
+        setSelectedJob(selectedJob);
+    };
 
     return (
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg" >
@@ -129,6 +148,9 @@ const JobTable = () => {
                                 Status
                             </th>
                             <th scope="col" class="px-6 py-3">
+                                Date create
+                            </th>
+                            <th scope="col" class="px-6 py-3">
                                 <span className="sr-only">Tool</span>
                             </th>
                         </tr>
@@ -140,11 +162,12 @@ const JobTable = () => {
                                     <td className="w-4 p-4">
                                         <div className="flex items-center">
                                             <input
-                                                id="checkbox-table-search-1"
+                                                id={`checkbox-table-search-${job.id}`}
                                                 type="checkbox"
                                                 className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                                onChange={() => handleRowSelect(job.id)}
                                             />
-                                            <label htmlFor="checkbox-table-search-1" className="sr-only">
+                                            <label htmlFor={`checkbox-table-search-${job.id}`} className="sr-only">
                                                 checkbox
                                             </label>
                                         </div>
@@ -168,9 +191,14 @@ const JobTable = () => {
                                             {job.job_status}
                                             <FiEdit
                                                 className='hover:text-blue-500 ms-1.5'
-                                                onClick={() => openActiveJobModal(job.job_id, job.job_status)}
+                                                onClick={() => openActiveJobModal(job)}
                                             />
-                                            <ActivejobModal open={activeJobModalOpen} onClose={closeActiveJobModal} />
+                                            <ActivejobModal open={activeJobModalOpen} onClose={closeActiveJobModal} jobId={selectedJob?.job_id} jobName={selectedJob?.job_name}  />
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center ">
+                                            {job.job_create}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">

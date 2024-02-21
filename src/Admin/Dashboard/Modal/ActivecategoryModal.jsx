@@ -3,19 +3,19 @@ import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@materia
 import { IoClose } from "react-icons/io5";
 import { useAlert } from './../../components/AlertContext';
 
-const ActivejobModal = ({ open, onClose , jobId , jobName }) => {
+const ActivecategoryModal = ({ open, onClose , categoryId , categoryName }) => {
 
     const { showAlert } = useAlert();
 
     const handleConfirm = async () => {
         try {
             
-            const response = await fetch(`http://localhost:3001/api/admin/job/updateStatus/${jobId}`, {
+            const response = await fetch(`http://localhost:3001/api/admin/category/updateStatus/${categoryId}`, {
                 method: 'PUT',
             });
 
             if (response.ok) {
-                showAlert('success', 'Job status updated successfully!');
+                showAlert('success', 'Category status updated successfully!');
                 onClose();
             } else {
                 const data = await response.json();
@@ -37,7 +37,7 @@ const ActivejobModal = ({ open, onClose , jobId , jobName }) => {
                 </div>
                 <DialogHeader ></DialogHeader>
                 <DialogBody className='text-gray-100 dark:text-gray-900'>
-                    Are you sure you want to Active {jobName} ID: {jobId} ?
+                    Are you sure you want to Active {categoryName} ID: {categoryId} ?
                 </DialogBody>
                 <DialogFooter>
                     <Button onClick={handleConfirm} className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center me-2">
@@ -52,4 +52,4 @@ const ActivejobModal = ({ open, onClose , jobId , jobName }) => {
     );
 }
 
-export default ActivejobModal;
+export default ActivecategoryModal;

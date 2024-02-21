@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AiOutlineSearch, AiFillDashboard } from 'react-icons/ai';
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
@@ -8,12 +8,18 @@ import { Button } from '@material-tailwind/react';
 import CreatecatModal from './../Modal/CreatecategoryModal';
 import EditcatModal from './../Modal/EditcategoryModal';
 import DeletecategoryModal from '../Modal/DeletecategoryModal';
+import ActivecategoryModal from '../Modal/ActivecategoryModal';
 
 const CategoryTable = () => {
 
+    const [categories, setCategories] = useState([])
+    const [totalCategories, setTotalCategories] = useState(0);
     const [createCatModalOpen, setCreateCatModalOpen] = useState(false);
     const [editCatModalOpen, setEditCatModalOpen] = useState(false);
-    const [deleteCatModalOpen , setDeleteCatModalOpen] = useState(false);
+    const [deleteCatModalOpen, setDeleteCatModalOpen] = useState(false);
+    const [activeCategoryModalOpen, setActiveCategoryModalOpen] = useState(false);
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null);
 
     const openCreateCatModal = () => setCreateCatModalOpen(true);
     const closeCreateCatModal = () => setCreateCatModalOpen(false);
@@ -23,6 +29,49 @@ const CategoryTable = () => {
 
     const openDeleteCatModal = () => setDeleteCatModalOpen(true);
     const closeDeleteCatModal = () => setDeleteCatModalOpen(false);
+
+    const openActiveCategoryModal = (category) => {
+        setSelectedCategory(category);
+        setActiveCategoryModalOpen(true);
+    };
+
+    const closeActiveCategoryModal = () => {
+        setSelectedCategory(null);
+        setActiveCategoryModalOpen(false);
+    };
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch(`http://localhost:3001/api/admin/category`);
+
+                const data = await response.json();
+                setCategories(data.categories);
+                setTotalCategories(data.totalCategories);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+        fetchCategories();
+    }, [categories]);
+
+    const handleRowSelect = (rowId) => {
+        const updatedSelectedRows = [...selectedRows];
+
+        if (updatedSelectedRows.includes(rowId)) {
+
+            const index = updatedSelectedRows.indexOf(rowId);
+            updatedSelectedRows.splice(index, 1);
+        } else {
+
+            updatedSelectedRows.push(rowId);
+        }
+
+        setSelectedRows(updatedSelectedRows);
+
+        const selectedCategory = categories.find((category) => category.id === rowId);
+        setSelectedCategory(selectedCategory);
+    };
 
     return (
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg" >
@@ -92,10 +141,13 @@ const CategoryTable = () => {
                                 </div>
                             </th>
                             <th scope="col" class="px-6 py-3">
-                                No.
+                                Category name
                             </th>
                             <th scope="col" class="px-6 py-3">
-                                Category name
+                                Status
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Date create
                             </th>
                             <th scope="col" class="px-6 py-3">
                                 <span className="sr-only">Tool</span>
@@ -103,42 +155,70 @@ const CategoryTable = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="bg-gray-800 border-b border-gray-700 dark:bg-white dark:border-gray-200">
-                            <td className="w-4 p-4">
-                                <div className="flex items-center">
-                                    <input
-                                        id="checkbox-table-search-1"
-                                        type="checkbox"
-                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                    />
-                                    <label htmlFor="checkbox-table-search-1" className="sr-only">
-                                        checkbox
-                                    </label>
-                                </div>
-                            </td>
-                            <td className="px-6 py-4">
-                                10005578
-                            </td>
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-200 whitespace-nowrap dark:text-gray-900">
-                                <div className="flex items-center ">
-                                    Thai name
-                                    <FiEdit
-                                        className='hover:text-blue-500 ms-1.5'
-                                        onClick={openEditCatModal} />
-                                </div>
-                                <EditcatModal open={editCatModalOpen} onClose={closeEditCatModal} />
-                            </th>
-                            <td className="px-6 py-4">
-                                <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
-                                onClick={openDeleteCatModal}
-                                >
-                                    <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
-                                        <RiDeleteBin6Fill />
-                                    </span>
-                                </Button>
-                                <DeletecategoryModal open={deleteCatModalOpen} onClose={closeDeleteCatModal} />
-                            </td>
-                        </tr>
+                        {categories.length > 0 ? (
+                            categories.map((category, index) => (
+                                <tr className="bg-gray-800 border-b border-gray-700 dark:bg-white dark:border-gray-200 hover:bg-gray-900 dark:hover:bg-gray-100">
+                                    <td className="w-4 p-4">
+                                        <div className="flex items-center">
+                                            <input
+                                                id={`checkbox-table-search-${category.id}`}
+                                                type="checkbox"
+                                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                                onChange={() => handleRowSelect(category.id)}
+                                            />
+                                            <label htmlFor={`checkbox-table-search-${category.id}`} className="sr-only">
+                                                checkbox
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center ">
+                                            {category.cat_name}
+                                            <FiEdit
+                                                className='hover:text-blue-500 ms-1.5'
+                                                onClick={openEditCatModal} />
+                                        </div>
+                                        <EditcatModal open={editCatModalOpen} onClose={closeEditCatModal} />
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center">
+                                            {category.cat_status === 'Active' ? (
+                                                <div className="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div>
+                                            ) : (
+                                                <div className="h-2.5 w-2.5 rounded-full bg-red-500 me-2"></div>
+                                            )}
+                                            {category.cat_status}
+                                            <FiEdit
+                                                className='hover:text-blue-500 ms-1.5'
+                                                onClick={() => openActiveCategoryModal(category)}
+                                            />
+                                            <ActivecategoryModal open={activeCategoryModalOpen} onClose={closeActiveCategoryModal} categoryId={selectedCategory?.cat_id} categoryName={selectedCategory?.cat_name}  />
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center ">
+                                            {category.cat_create}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
+                                            onClick={openDeleteCatModal}
+                                        >
+                                            <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
+                                                <RiDeleteBin6Fill />
+                                            </span>
+                                        </Button>
+                                        <DeletecategoryModal open={deleteCatModalOpen} onClose={closeDeleteCatModal} />
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="5" className="text-center text-gray-500 dark:text-gray-400 py-4">
+                                    No users found.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>

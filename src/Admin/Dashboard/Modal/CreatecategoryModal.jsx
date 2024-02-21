@@ -6,13 +6,45 @@ const CreatecategoryModal = ({ open, onClose }) => {
 
     const { showAlert } = useAlert();
 
-    const handleConfirm = () => {
+    const [categoryName, setCategoryName] = useState('');
+    const [categoryStatus, setCategoryStatus] = useState('Inactive');
 
-        // Close the modal
-        onClose();
 
-        // Show the alert
-        showAlert('success', 'Category Add successfully!');
+    const handleCategoryStatusChange = (e) => {
+        setCategoryStatus(e.target.value);
+    };
+
+
+    const handleConfirm = async () => {
+
+        try {
+
+            const categoryData = {
+                category_name: categoryName,
+                category_status: categoryStatus,
+            };
+
+            const response = await fetch('http://localhost:3001/api/admin/addcategory', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(categoryData),
+            });
+
+            const data = await response.json();
+            console.log(data);
+
+
+            onClose();
+
+
+            showAlert('success', 'Category added successfully!');
+
+        } catch (error) {
+            console.error('Error:', error);
+
+        }
     };
 
     return (
@@ -22,10 +54,24 @@ const CreatecategoryModal = ({ open, onClose }) => {
                 <DialogBody className='text-gray-100 dark:text-gray-900'>
                     <form>
                         <div class="mb-6">
-                            <label for="category" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Category</label>
-                            <input type="text" id="category"
+                            <label for="categoryName" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Category</label>
+                            <input type="text" id="categoryName"
+                                value={categoryName}
+                                onChange={(e) => setCategoryName(e.target.value)}
                                 className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
                                 placeholder="หมวดหมู่..." required />
+                        </div>
+                        <div className="mb-6">
+                            <label htmlFor="categoryStatus" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Category Status</label>
+                            <select
+                                id="categoryStatus"
+                                value={categoryStatus}
+                                onChange={handleCategoryStatusChange}
+                                className="bg-gray-700 border border-gray-600 text-white text-md rounded-lg w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
+                            >
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
                         </div>
                     </form>
                 </DialogBody>

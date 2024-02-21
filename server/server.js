@@ -302,6 +302,71 @@ app.put('/api/admin/job/updateStatus/:jobId', async (req, res) => {
     }
 });
 
+app.get('/api/admin/category', async (req, res) => {
+    try {
+        
+        const result = await queryPromise('SELECT * FROM category');
+
+        
+        res.status(200).json({ categories: result, totalCategories: result.length });
+    } catch (error) {
+        console.error('Error fetching job data:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+app.post('/api/admin/addcategory', async (req, res) => {
+    try {
+        const { category_name, category_status } = req.body;
+
+        // Check if the job name is provided
+        const existingJob = await queryPromise('SELECT * FROM category WHERE cat_name = ?', [category_name]);
+
+        if (existingJob && existingJob.length > 0) {
+            return res.status(400).json({ error: 'Category already exists.' });
+        }
+
+        // Insert the job into the database
+        const result = await queryPromise('INSERT INTO category (cat_name, cat_status, cat_create) VALUES (?, ?, NOW())', [category_name, category_status]);
+
+        if (result.affectedRows === 1) {
+            res.status(201).json({ success: true, message: 'Category created successfully.' });
+        } else {
+            res.status(500).json({ error: 'Error adding category.' });
+        }
+    } catch (error) {
+        console.error('Error adding category:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+app.put('/api/admin/category/updateStatus/:categoryId', async (req, res) => {
+    try {
+        const categoryId = req.params.categoryId;
+
+        // Fetch the current job status from the database
+        const currentStatusQuery = await queryPromise('SELECT cat_status FROM category WHERE cat_id = ?', [categoryId]);
+
+        if (!currentStatusQuery || currentStatusQuery.length === 0) {
+            return res.status(404).json({ error: 'category not found.' });
+        }
+
+        const currentStatus = currentStatusQuery[0].cat_status;
+
+        // Toggle the status
+        const updatedStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+
+        // Update the job status in the database
+        const updateQuery = 'UPDATE category SET cat_status = ? WHERE cat_id = ?';
+        await queryPromise(updateQuery, [updatedStatus, categoryId]);
+
+        res.status(200).json({ success: true, message: 'Category status updated successfully.', updatedStatus });
+    } catch (error) {
+        console.error('Error updating categoey status:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
