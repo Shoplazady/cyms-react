@@ -271,7 +271,7 @@ const SortableTable = ({ usersPerPage, onPageChange, onSearchChange }) => {
                                     </Button>
                                 </div>
                                 
-                                <DeleteModal open={deleteModalOpen} onClose={closeDeleteModal} onConfirm={handleDelete} userId={selectedUser?.id} userName={selectedUser ? `${selectedUser.first_name} ${selectedUser.last_name}` : ''} />
+                                <DeleteModal open={deleteModalOpen} onClose={closeDeleteModal} onConfirm={handleDelete} orderId={selectedUser?.id} userName={selectedUser ? `${selectedUser.first_name} ${selectedUser.last_name}` : ''} />
                                 <EdituserModal open={editUserModalOpen} onClose={closeEditUserModal} userId={selectedUser?.id} />
                             </td>
 
