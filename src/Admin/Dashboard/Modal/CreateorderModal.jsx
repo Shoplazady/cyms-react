@@ -35,10 +35,6 @@ const CreateOrderModal = ({ open, onClose }) => {
         }
     };
 
-    const handleSelectChange = (selectedOption) => {
-        setSelectedOption(selectedOption);
-    };
-
     const handleIncrement = (id) => {
         setOrders((prevOrders) =>
             prevOrders.map((order) =>

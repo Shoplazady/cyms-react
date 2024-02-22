@@ -168,11 +168,13 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                     <thead className="text-xs text-gray-400 uppercase bg-gray-700 dark:bg-gray-50 dark:text-gray-700">
                         <tr>
                             <th scope="col" className="p-4">
-                                <div className="flex items-center">
+                            <div className="flex items-center">
                                     <input
                                         id="checkbox-all-search"
                                         type="checkbox"
                                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                        checked={selectAll}
+                                        onChange={() => handleSelectAll()}
                                     />
                                     <label htmlFor="checkbox-all-search" className="sr-only">
                                         checkbox
@@ -211,7 +213,7 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                             </th>
                             <th scope="col" class="px-6 py-3">
                                 <div className="flex items-center">
-                                    Price
+                                    Price (฿)
                                     <FaArrowsUpDown className='w-3 h-3 ms-1.5' />
                                 </div>
                             </th>

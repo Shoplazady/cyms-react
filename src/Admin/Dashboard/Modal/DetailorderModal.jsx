@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@material-tailwind/react';
+import { RiDeleteBin6Fill } from "react-icons/ri";
 
 const DetailorderModal = ({ open, onClose, detailId }) => {
 
@@ -34,14 +35,20 @@ const DetailorderModal = ({ open, onClose, detailId }) => {
                         <table className="w-full text-sm text-left rtl:text-right text-gray-300 dark:text-gray-800">
                             <thead class="text-xs text-gray-50 uppercase bg-gray-900 dark:bg-gray-200 dark:text-gray-900">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3 rounded-s-lg">
+                                    <th scope="col" className="px-6 py-3">
                                         Product name
                                     </th>
                                     <th scope="col" className="px-6 py-3">
                                         Qty
                                     </th>
-                                    <th scope="col" className="px-6 py-3 rounded-e-lg">
-                                        Price ( ฿ ) 
+                                    <th scope="col" className="px-6 py-3">
+                                        Price (฿)
+                                    </th>
+                                    <th scope="col" className="px-6 py-3">
+                                        Total price (฿)
+                                    </th>
+                                    <th scope="col" className="sr-only">
+                                        Tool
                                     </th>
                                 </tr>
                             </thead>
@@ -56,7 +63,13 @@ const DetailorderModal = ({ open, onClose, detailId }) => {
                                                 {detail.detail_quantity}
                                             </td>
                                             <td className="px-6 py-4">
-                                                ฿{detail.detail_price}
+                                                {detail.detail_price}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {detail.detail_price * detail.detail_quantity}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <RiDeleteBin6Fill className='w-5 h-5 text-red-500 hover:text-red-700' />
                                             </td>
                                         </tr>
                                     ))
@@ -73,7 +86,8 @@ const DetailorderModal = ({ open, onClose, detailId }) => {
                                     <tr className="font-semibold text-gray-100 dark:text-gray-900">
                                         <th scope="row" className="px-6 py-3 text-base">Total</th>
                                         <td className="px-6 py-3">{details.reduce((total, detail) => total + detail.detail_quantity, 0)}</td>
-                                        <td className="px-6 py-3">฿{details.reduce((total, detail) => total + detail.detail_price, 0)}</td>
+                                        <td className="px-6 py-3">{details.reduce((total, detail) => total + detail.detail_price, 0)}</td>
+                                        <td className="px-6 py-3">{details.reduce((total, detail) => total + detail.detail_price*detail.detail_quantity, 0)}</td>
                                     </tr>
                                 ) : (
                                     <tr>

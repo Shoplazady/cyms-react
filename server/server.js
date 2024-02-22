@@ -452,7 +452,7 @@ app.get('/api/admin/orders', async (req, res) => {
                 DATE_FORMAT(orders.order_create, '%Y-%m-%d %H:%i:%s') AS order_create,
                 orders.order_state,
                 orders.order_status,
-                SUM(order_detail.detail_price) as total_price
+                SUM(order_detail.detail_price * order_detail.detail_quantity) as total_price
             FROM
                 orders
                 JOIN users ON orders.user_id = users.id
@@ -501,55 +501,6 @@ app.get('/api/admin/detail/:detailId', async (req, res) => {
     } catch (error) {
         console.error('Error fetching detail data:', error);
         res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-app.post('/api/admin/addorder', async (req, res) => {
-    try {
-        const { userId, orders } = req.body;
-        const orderNum = generateOrderNumber();
-
-        const insertOrderQuery = await queryPromise('INSERT INTO orders (order_num, user_id, order_status, order_state, order_create) VALUES (?, ?, ?, ?, NOW())', [orderNum, userId, 'Inactive', 'pending']);
-        const orderId = insertOrderQuery.insertId;
-
-        const insertOrderDetailsQuery = await Promise.all(
-            orders.map(async (order) => {
-                const { itemName, quantity, price, link } = order;
-                const insertDetailQuery = await queryPromise('INSERT INTO order_detail (order_id, detail_name, detail_quantity, detail_price, detail_url, detail_create) VALUES (?, ?, ?, ?, ?, NOW())', [orderId, itemName, quantity, price, link]);
-                return insertDetailQuery.insertId; // Return the detail_id
-            })
-        );
-
-        res.status(201).json({ message: 'Order created successfully!', orderId, detailIds: insertOrderDetailsQuery });
-    } catch (error) {
-        console.error('Error creating order:', error);
-        res.status(500).json({ error: 'Internal server error.' });
-    }
-});
-
-app.post('/api/admin/uploadorderimages', upload.array('detailPath'), async (req, res) => {
-    try {
-        const orderId = req.body.orderId;
-        const detailIds = Array.isArray(req.body.detailIds) ? req.body.detailIds : [];
-
-        console.log(req.detailId);
-
-        // Assuming you have an array of files in req.files
-        const images = req.files.map(file => `/images_order/${file.filename}`);
-
-        // Your logic to update the database with the array of file paths for each detailId
-        await Promise.all(detailIds.map(async (detailId, index) => {
-            const updateOrderDetailsQuery = await queryPromise(
-                'UPDATE order_detail SET detail_path=? WHERE detail_id=? AND order_id=?',
-                [images[index], detailId, orderId]
-            );
-            return updateOrderDetailsQuery;
-        }));
-
-        res.status(200).json({ message: 'Order details updated successfully!' });
-    } catch (error) {
-        console.error('Error updating order details:', error);
-        res.status(500).json({ error: 'Internal server error.' });
     }
 });
 
