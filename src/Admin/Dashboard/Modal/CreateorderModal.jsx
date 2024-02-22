@@ -1,44 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@material-tailwind/react';
-import { FaPlus, FaMinus, FaLink } from "react-icons/fa";
-import { RiDeleteBin6Fill } from "react-icons/ri";
-import { MdAttachFile } from "react-icons/md";
+import { FaLink, FaPlus, FaMinus } from 'react-icons/fa';
+import { RiDeleteBin6Fill } from 'react-icons/ri';
+import { MdAttachFile } from 'react-icons/md';
 import { useAlert } from './../../components/AlertContext';
 
-const CreateorderModal = ({ open, onClose }) => {
+const CreateOrderModal = ({ open, onClose }) => {
+    const [users, setUsers] = useState([]);
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [orders, setOrders] = useState([
+        { id: 1, itemName: '', link: '', price: '', quantity: 1 },
+    ]);
+    const [showLinkInput, setShowLinkInput] = useState(false);
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
 
     const { showAlert } = useAlert();
 
-    const handleConfirm = () => {
-        
-        // Close the modal
-        onClose();
-    
-        // Show the alert
-        showAlert('success', 'Order created successfully!');
-      };
+    useEffect(() => {
+        fetchUsersForSelectOptions();
+    }, []);
 
-    const [selectedOption, setSelectedOption] = useState(null);
-
-    const options = [
-        { value: 'united_states', label: 'United States' },
-        { value: 'canada', label: 'Canada' },
-        { value: 'france', label: 'France' },
-        { value: 'america', label: 'America' },
-
-    ];
+    const fetchUsersForSelectOptions = async () => {
+        try {
+            const response = await fetch('http://localhost:3001/api/admin/users/options');
+            if (response.ok) {
+                const data = await response.json();
+                setUsers(data.users);
+            } else {
+                console.error('Failed to fetch users for select options:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error fetching users for select options:', error);
+        }
+    };
 
     const handleSelectChange = (selectedOption) => {
         setSelectedOption(selectedOption);
     };
-
-    const [orders, setOrders] = useState([
-        { id: 1, itemName: '', link: '', price: '', quantity: 1 },
-    ]);
-
-    const [showLinkInput, setShowLinkInput] = useState(false);
-    const [selectedOrderId, setSelectedOrderId] = useState(null);
 
     const handleIncrement = (id) => {
         setOrders((prevOrders) =>
@@ -68,7 +67,6 @@ const CreateorderModal = ({ open, onClose }) => {
     };
 
     const handleLinkLabelClick = (id) => {
-        // Toggle the visibility of the URL input field
         setShowLinkInput((prevShowLinkInput) => !prevShowLinkInput);
         setSelectedOrderId(id);
     };
@@ -77,29 +75,75 @@ const CreateorderModal = ({ open, onClose }) => {
         return orders.reduce((total, order) => total + order.price * order.quantity, 0);
     };
 
+    const handleConfirm = async () => {
+        try {
+            if (!selectedOption) {
+                showAlert('error', 'Please select a user.');
+                return;
+            }
+
+            if (orders.length === 0) {
+                showAlert('error', 'Please add at least one order.');
+                return;
+            }
+
+            const userId = selectedOption.value;
+
+            const ordersData = orders.map((order) => ({
+                detailName: order.itemName,
+                detailQuantity: order.quantity,
+                detailPrice: order.price,
+                detailUrl: order.link || null,
+                detailPath: order.picture ? `images_order/${order.picture.name}` : null,
+            }));
+
+            const response = await fetch('http://localhost:3001/api/admin/addorder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userId, orders: ordersData }),
+            });
+
+            if (response.ok) {
+                showAlert('success', 'Order created successfully!');
+
+                setSelectedOption(null);
+                setOrders([{ id: 1, itemName: '', link: '', price: '', quantity: 1 }]);
+                setShowLinkInput(false);
+
+                onClose();
+            } else {
+                showAlert('error', `Failed to create order: ${response.statusText}`);
+            }
+        } catch (error) {
+            showAlert('error', `Error creating order: ${error.message}`);
+        }
+    };
+
     return (
-        <Dialog open={open} handler={onClose} className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-opacity-5 text-gray-100 dark:text-gray-900">
+        <Dialog
+            open={open}
+            className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-opacity-5 text-gray-100 dark:text-gray-900"
+        >
             <div className="lg:w-1/2 md:w-full bg-gray-700 dark:bg-gray-100 p-8 rounded-md overflow-y-auto max-h-screen">
                 <DialogHeader>Add new order</DialogHeader>
                 <DialogBody className='text-gray-100 dark:text-gray-900 overflow-y-auto max-h-lg'>
                     <form>
-                        <div class="mb-6">
-                            <label for="employee_name" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Employee name</label>
+                        <div className="mb-6">
+                            <label htmlFor="employee_name" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Employee name</label>
                             <Select
-                                id="em_name"
+                                className='text-black'
+                                options={users.map(user => ({ value: user.id, label: `${user.first_name} ${user.last_name}` }))}
+                                onChange={selected => setSelectedOption(selected)}
                                 value={selectedOption}
-                                onChange={handleSelectChange}
-                                options={options}
-                                isSearchable
-                                className="text-gray-900 dark:text-gray-800 bg-gray-700 border border-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="Search for a Employee..."
+                                placeholder="Select a user..."
                             />
                         </div>
                         <div className="mb-6">
-                            <label for="orderAdd" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Order Add</label>
+                            <label htmlFor="orderAdd" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Order Add</label>
                             {orders.map((order) => (
                                 <div className="mb-6 space-y-4" key={order.id}>
-                                    {/* Row 1: Item Name and Picture */}
                                     <div className="flex items-center">
                                         <input
                                             type="text"
@@ -116,7 +160,6 @@ const CreateorderModal = ({ open, onClose }) => {
                                             }
                                             required
                                         />
-                                        {/* Add Link URL */}
                                         <label
                                             htmlFor={`link-${order.id}`}
                                             className="ml-2 p-2 text-blue-500 hover:text-blue-700 cursor-pointer"
@@ -140,8 +183,6 @@ const CreateorderModal = ({ open, onClose }) => {
                                                 }
                                             />
                                         )}
-
-                                        {/* Add  picture */}
                                         <label
                                             htmlFor={`file-${order.id}`}
                                             className="ml-2 p-2 text-blue-500 hover:text-blue-700 cursor-pointer"
@@ -151,19 +192,20 @@ const CreateorderModal = ({ open, onClose }) => {
                                                 type="file"
                                                 id={`file-${order.id}`}
                                                 className="hidden"
-                                                onChange={(e) =>
+                                                onChange={(e) => {
+                                                    const selectedFile = e.target.files[0];
+                                                    console.log('Selected File:', selectedFile);
+
                                                     setOrders((prevOrders) =>
                                                         prevOrders.map((o) =>
-                                                            o.id === order.id ? { ...o, picture: e.target.files[0] } : o
+                                                            o.id === order.id ? { ...o, picture: selectedFile } : o
                                                         )
-                                                    )
-                                                }
+                                                    );
+                                                }}
                                             />
                                         </label>
                                     </div>
-
-                                    {/* Row 2: Price and Quantity */}
-                                    <div className="relative flex items-center space-x-1 max-w-[8rem]" >
+                                    <div className="relative flex items-center space-x-1 max-w-[8rem]">
                                         <input
                                             type="text"
                                             id={`price-${order.id}`}
@@ -216,7 +258,7 @@ const CreateorderModal = ({ open, onClose }) => {
                             <FaPlus className="w-6 h-6" onClick={handleAddOrder} />
                         </div>
                     </form>
-                </DialogBody >
+                </DialogBody>
                 <DialogFooter className='flex justify-between items-center'>
                     <div className="text-white dark:text-gray-900">
                         Total Price: {calculateTotal().toFixed(2)}
@@ -230,9 +272,9 @@ const CreateorderModal = ({ open, onClose }) => {
                         </Button>
                     </div>
                 </DialogFooter>
-            </div >
-        </Dialog >
+            </div>
+        </Dialog>
     );
 };
 
-export default CreateorderModal;
+export default CreateOrderModal;

@@ -31,6 +31,11 @@ db.connect((err) => {
     }
 });
 
+function generateOrderNumber() {
+    // Generate a random 6-digit number
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
 const queryPromise = (sql, values) => {
     return new Promise((resolve, reject) => {
         db.query(sql, values, (error, results, fields) => {
@@ -45,7 +50,7 @@ const queryPromise = (sql, values) => {
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'user_pic');
+        cb(null, file.fieldname === 'profilePic' ? 'user_pic' : 'images_order');
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -140,6 +145,21 @@ app.get('/api/admin/users', async (req, res) => {
         });
     } catch (error) {
         console.error('Error retrieving user data:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+app.get('/api/admin/users/options', async (req, res) => {
+    try {
+        const usersQuery = await queryPromise(`
+            SELECT id, first_name, last_name
+            FROM users
+            WHERE level = 1
+        `);
+
+        res.status(200).json({ users: usersQuery });
+    } catch (error) {
+        console.error('Error retrieving user data for select options:', error);
         res.status(500).json({ error: 'Internal server error.' });
     }
 });
@@ -481,6 +501,35 @@ app.get('/api/admin/detail/:detailId', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+app.post('/api/admin/addorder', upload.single('images_order'), async (req, res) => {
+    try {
+        
+        const { userId, orders } = req.body;
+
+        
+        const orderNum = generateOrderNumber();
+
+        
+        const insertOrderQuery = await queryPromise('INSERT INTO orders (order_num, user_id, order_status, order_state, order_create) VALUES (?, ?, ?, ?, NOW())', [orderNum, userId, 'Inactive', 'pending']);
+        const orderId = insertOrderQuery.insertId;
+
+        
+        const insertOrderDetailsQuery = await Promise.all(
+            orders.map(async (order) => {
+                const { detailName, detailQuantity, detailPrice, detailUrl } = order;
+                const imagePath = detailPath ? `images_order/${path.basename(detailPath)}` : null;
+                return await queryPromise('INSERT INTO order_detail (order_id, detail_name, detail_quantity, detail_price, detail_url, detail_path, detail_create) VALUES (?, ?, ?, ?, ?, ?, NOW())', [orderId, detailName, detailQuantity, detailPrice, detailUrl, imagePath]);
+            })
+        );
+
+        res.status(201).json({ message: 'Order created successfully!', orderId, orderDetails: insertOrderDetailsQuery });
+    } catch (error) {
+        console.error('Error creating order:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
