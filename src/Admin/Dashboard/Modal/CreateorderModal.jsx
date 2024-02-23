@@ -89,44 +89,33 @@ const CreateOrderModal = ({ open, onClose }) => {
 
             const userId = selectedOption.value;
 
-            const ordersData = orders.map((order) => {
-                // Extracting file name from the File object
-                const fileName = order.picture ? order.picture.name : null;
-            
-                return {
-                    detailName: order.itemName,
-                    detailQuantity: order.quantity,
-                    detailPrice: order.price,
-                    detailUrl: order.link || null,
-                    detailPath: fileName ? `images_order/${fileName}` : null,
-                };
+            const formData = new FormData();
+            formData.append('userId', userId);
+            formData.append('orders', JSON.stringify(orders));
+
+            orders.forEach((order, index) => {
+                formData.append('detailPath', order.picture || null);
             });
 
-            console.log('Orders Data:', ordersData);
-
-            const response = await fetch('http://localhost:3001/api/admin/addorder', {
+            const createOrderResponse = await fetch('http://localhost:3001/api/admin/createorderanduploadimages', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ userId, orders: ordersData }),
+                body: formData,
             });
 
-            if (response.ok) {
+            if (createOrderResponse.ok) {
                 showAlert('success', 'Order created successfully!');
-
                 setSelectedOption(null);
                 setOrders([{ id: 1, itemName: '', link: '', price: '', quantity: 1 }]);
                 setShowLinkInput(false);
-
                 onClose();
             } else {
-                showAlert('error', `Failed to create order: ${response.statusText}`);
+                showAlert('error', `Failed to create order: ${createOrderResponse.statusText}`);
             }
         } catch (error) {
             showAlert('error', `Error creating order: ${error.message}`);
         }
     };
+
 
     return (
         <Dialog
@@ -149,7 +138,7 @@ const CreateOrderModal = ({ open, onClose }) => {
                         </div>
                         <div className="mb-6">
                             <label htmlFor="orderAdd" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Order Add</label>
-                            {orders.map((order) => (
+                            {orders.map((order, index) => (
                                 <div className="mb-6 space-y-4" key={order.id}>
                                     <div className="flex items-center">
                                         <input

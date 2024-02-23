@@ -504,30 +504,77 @@ app.get('/api/admin/detail/:detailId', async (req, res) => {
     }
 });
 
-app.post('/api/admin/addorder', upload.single('images_order'), async (req, res) => {
+app.post('/api/admin/addorder', async (req, res) => {
     try {
-        
         const { userId, orders } = req.body;
-
-        
         const orderNum = generateOrderNumber();
 
-        
         const insertOrderQuery = await queryPromise('INSERT INTO orders (order_num, user_id, order_status, order_state, order_create) VALUES (?, ?, ?, ?, NOW())', [orderNum, userId, 'Inactive', 'pending']);
         const orderId = insertOrderQuery.insertId;
 
-        
         const insertOrderDetailsQuery = await Promise.all(
             orders.map(async (order) => {
-                const { detailName, detailQuantity, detailPrice, detailUrl, detailPath } = order;
-                
-                return await queryPromise('INSERT INTO order_detail (order_id, detail_name, detail_quantity, detail_price, detail_url, detail_path, detail_create) VALUES (?, ?, ?, ?, ?, ?, NOW())', [orderId, detailName, detailQuantity, detailPrice, detailUrl, detailPath]);
+                const { itemName, quantity, price, link } = order;
+                const insertDetailQuery = await queryPromise('INSERT INTO order_detail (order_id, detail_name, detail_quantity, detail_price, detail_url, detail_create) VALUES (?, ?, ?, ?, ?, NOW())', [orderId, itemName, quantity, price, link]);
+                return insertDetailQuery.insertId; // Return the detail_id
             })
         );
 
-        res.status(201).json({ message: 'Order created successfully!', orderId, orderDetails: insertOrderDetailsQuery });
+        res.status(201).json({ message: 'Order created successfully!', orderId, detailIds: insertOrderDetailsQuery });
     } catch (error) {
         console.error('Error creating order:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+app.post('/api/admin/uploadorderimages', upload.array('detailPath'), async (req, res) => {
+    try {
+        const orderId = req.body.orderId;
+        const detailIds = Array.isArray(req.body.detailIds) ? req.body.detailIds : [];
+
+        console.log(req.detailId);
+
+        // Assuming you have an array of files in req.files
+        const images = req.files.map(file => `/images_order/${file.filename}`);
+
+        // Your logic to update the database with the array of file paths for each detailId
+        await Promise.all(detailIds.map(async (detailId, index) => {
+            const updateOrderDetailsQuery = await queryPromise(
+                'UPDATE order_detail SET detail_path=? WHERE detail_id=? AND order_id=?',
+                [images[index], detailId, orderId]
+            );
+            return updateOrderDetailsQuery;
+        }));
+
+        res.status(200).json({ message: 'Order details updated successfully!' });
+    } catch (error) {
+        console.error('Error updating order details:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+app.post('/api/admin/createorderanduploadimages', upload.array('detailPath'), async (req, res) => {
+    try {
+        const { userId, orders: ordersString } = req.body;
+        const orders = JSON.parse(ordersString);
+
+        // First, create the order
+        const orderNum = generateOrderNumber();
+        const insertOrderQuery = await queryPromise('INSERT INTO orders (order_num, user_id, order_status, order_state, order_create) VALUES (?, ?, ?, ?, NOW())', [orderNum, userId, 'Inactive', 'pending']);
+        const orderId = insertOrderQuery.insertId;
+
+        const insertOrderDetailsQuery = await Promise.all(
+            orders.map(async (order, index) => {
+                const { itemName, quantity, price, link } = order;
+                const detailPath = req.files[index] ? `/images_order/${req.files[index].filename}` : null;
+                const insertDetailQuery = await queryPromise('INSERT INTO order_detail (order_id, detail_name, detail_quantity, detail_price, detail_url, detail_path, detail_create) VALUES (?, ?, ?, ?, ?, ?, NOW())', [orderId, itemName, quantity, price, link, detailPath]);
+                return insertDetailQuery.insertId; // Return the detail_id
+            })
+        );
+
+        res.status(200).json({ message: 'Order created successfully!', orderId, detailIds: insertOrderDetailsQuery });
+    } catch (error) {
+        console.error('Error creating order and details:', error);
         res.status(500).json({ error: 'Internal server error.' });
     }
 });
