@@ -89,13 +89,20 @@ const CreateOrderModal = ({ open, onClose }) => {
 
             const userId = selectedOption.value;
 
-            const ordersData = orders.map((order) => ({
-                detailName: order.itemName,
-                detailQuantity: order.quantity,
-                detailPrice: order.price,
-                detailUrl: order.link || null,
-                detailPath: order.picture ? `images_order/${order.picture.name}` : null,
-            }));
+            const ordersData = orders.map((order) => {
+                // Extracting file name from the File object
+                const fileName = order.picture ? order.picture.name : null;
+            
+                return {
+                    detailName: order.itemName,
+                    detailQuantity: order.quantity,
+                    detailPrice: order.price,
+                    detailUrl: order.link || null,
+                    detailPath: fileName ? `images_order/${fileName}` : null,
+                };
+            });
+
+            console.log('Orders Data:', ordersData);
 
             const response = await fetch('http://localhost:3001/api/admin/addorder', {
                 method: 'POST',

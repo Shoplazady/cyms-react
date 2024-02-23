@@ -14,6 +14,8 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/user_pic', express.static(path.join(__dirname, 'user_pic')));
+app.use('/images_order', express.static(path.join(__dirname, 'images_order')));
+
 
 // MySQL Connection
 const db = mysql.createConnection({
@@ -517,9 +519,9 @@ app.post('/api/admin/addorder', upload.single('images_order'), async (req, res) 
         
         const insertOrderDetailsQuery = await Promise.all(
             orders.map(async (order) => {
-                const { detailName, detailQuantity, detailPrice, detailUrl } = order;
-                const imagePath = detailPath ? `images_order/${path.basename(detailPath)}` : null;
-                return await queryPromise('INSERT INTO order_detail (order_id, detail_name, detail_quantity, detail_price, detail_url, detail_path, detail_create) VALUES (?, ?, ?, ?, ?, ?, NOW())', [orderId, detailName, detailQuantity, detailPrice, detailUrl, imagePath]);
+                const { detailName, detailQuantity, detailPrice, detailUrl, detailPath } = order;
+                
+                return await queryPromise('INSERT INTO order_detail (order_id, detail_name, detail_quantity, detail_price, detail_url, detail_path, detail_create) VALUES (?, ?, ?, ?, ?, ?, NOW())', [orderId, detailName, detailQuantity, detailPrice, detailUrl, detailPath]);
             })
         );
 
