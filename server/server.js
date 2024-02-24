@@ -557,6 +557,31 @@ app.put('/api/admin/order/updateStatus/:orderId', async (req, res) => {
     }
 });
 
+app.delete('/api/admin/deleteorder/:orderId', async (req, res) => {
+    const orderId = req.params.orderId;
+    console.log('Received request to delete order with ID:', orderId);
+
+    try {
+        
+        const orderResult = await queryPromise('SELECT * FROM orders WHERE order_id = ?', [orderId]);
+
+        if (!orderResult || orderResult.length === 0) {
+            return res.status(404).json({ error: 'Order not found.' });
+        }
+
+        
+        await queryPromise('DELETE FROM detail_order WHERE order_id = ?', [orderId]);
+
+        
+        await queryPromise('DELETE FROM orders WHERE order_id = ?', [orderId]);
+
+        res.status(200).json({ success: true, message: 'Order and related details deleted successfully.' });
+    } catch (error) {
+        console.error('Error deleting order and details:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

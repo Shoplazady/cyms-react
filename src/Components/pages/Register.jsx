@@ -124,7 +124,7 @@ const Register = () => {
                                     <input
                                         type="text"
                                         name="position"
-                                        class="rounded-none rounded-r-md bg-stone-800 text-stone-100 flex-1 min-w-0 w-full text-sm p-2.5 dark:bg-gray-100 dark:placeholder-gray-400 dark:text-black"
+                                        className="rounded-none rounded-r-md bg-stone-800 text-stone-100 flex-1 min-w-0 w-full text-sm p-2.5 dark:bg-gray-100 dark:placeholder-gray-400 dark:text-black"
                                         placeholder="Job Position"
                                         value={formData.position} onChange={handleInputChange}
                                         required
@@ -141,7 +141,7 @@ const Register = () => {
                                     <input
                                         type="text"
                                         name="agency"
-                                        class="rounded-none rounded-r-md bg-stone-800 text-stone-100 flex-1 min-w-0 w-full text-sm p-2.5 dark:bg-gray-100 dark:placeholder-gray-400 dark:text-black"
+                                        className="rounded-none rounded-r-md bg-stone-800 text-stone-100 flex-1 min-w-0 w-full text-sm p-2.5 dark:bg-gray-100 dark:placeholder-gray-400 dark:text-black"
                                         placeholder="Agency"
                                         value={formData.agency} onChange={handleInputChange}
                                         required
@@ -159,7 +159,7 @@ const Register = () => {
                                 <input
                                     type="tel"
                                     name="tel_num"
-                                    class="rounded-none rounded-r-md bg-stone-800 text-stone-100 flex-1 min-w-0 w-full text-sm p-2.5 dark:bg-gray-100 dark:placeholder-gray-400 dark:text-black"
+                                    className="rounded-none rounded-r-md bg-stone-800 text-stone-100 flex-1 min-w-0 w-full text-sm p-2.5 dark:bg-gray-100 dark:placeholder-gray-400 dark:text-black"
                                     placeholder="Telephone Number"
                                     value={formData.tel_num} onChange={handleInputChange}
                                     required

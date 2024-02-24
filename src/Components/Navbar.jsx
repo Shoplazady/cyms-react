@@ -8,7 +8,7 @@ import { FiAlignJustify, FiArrowUp, FiLogOut } from "react-icons/fi";
 import { FaHome, FaPlus, FaList, FaClipboard } from 'react-icons/fa';
 import {
     Navbar as MaterialNavbar,
-    MobileNav,
+    Collapse, 
     Typography,
     Button,
     IconButton,
@@ -214,9 +214,9 @@ const Navbar = () => {
                     </div>
                 </div>
             </div>
-            <MobileNav open={openNav}>
+            <Collapse open={openNav}>
                 <div className="container mx-auto">{navList}</div>
-            </MobileNav>
+            </Collapse>
         </MaterialNavbar>
     );
 };
