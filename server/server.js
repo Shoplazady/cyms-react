@@ -530,6 +530,33 @@ app.post('/api/admin/createorderanduploadimages', upload.array('detailPath'), as
     }
 });
 
+app.put('/api/admin/order/updateStatus/:orderId', async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+
+        // Fetch the current job status from the database
+        const currentStatusQuery = await queryPromise('SELECT order_status FROM orders WHERE order_id = ?', [orderId]);
+
+        if (!currentStatusQuery || currentStatusQuery.length === 0) {
+            return res.status(404).json({ error: 'order not found.' });
+        }
+
+        const currentStatus = currentStatusQuery[0].order_status;
+
+        // Toggle the status
+        const updatedStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+
+        // Update the job status in the database
+        const updateQuery = 'UPDATE orders SET order_status = ? WHERE order_id = ?';
+        await queryPromise(updateQuery, [updatedStatus, orderId]);
+
+        res.status(200).json({ success: true, message: 'Order status updated successfully.', updatedStatus });
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

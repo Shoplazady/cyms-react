@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@material-tailwind/react';
 import { RiDeleteBin6Fill } from "react-icons/ri";
+import { FiCheckCircle } from "react-icons/fi";
 
 const DetailorderModal = ({ open, onClose, detailId }) => {
 
@@ -56,9 +57,9 @@ const DetailorderModal = ({ open, onClose, detailId }) => {
                                 {details.length > 0 ? (
                                     details.map((detail, index) => (
                                         <tr className="bg-gray-800 dark:bg-gray-100">
-                                            <th scope="row" className="px-6 py-4 font-medium text-gray-50 whitespace-nowrap dark:text-gray-900">
+                                            <td scope="row" className="px-6 py-4 font-medium text-gray-50 whitespace-nowrap dark:text-gray-900">
                                                 {detail.detail_name}
-                                            </th>
+                                            </td>
                                             <td className="px-6 py-4">
                                                 {detail.detail_quantity}
                                             </td>
@@ -68,8 +69,12 @@ const DetailorderModal = ({ open, onClose, detailId }) => {
                                             <td className="px-6 py-4">
                                                 {detail.detail_price * detail.detail_quantity}
                                             </td>
-                                            <td className="px-6 py-4">
+                                            <td className="flex items-center px-6 py-4 space-x-3">
+                                                
+                                                <FiCheckCircle className='w-5 h-5 text-green-500 hover:text-green-700' />
+
                                                 <RiDeleteBin6Fill className='w-5 h-5 text-red-500 hover:text-red-700' />
+                                                
                                             </td>
                                         </tr>
                                     ))
@@ -87,7 +92,7 @@ const DetailorderModal = ({ open, onClose, detailId }) => {
                                         <th scope="row" className="px-6 py-3 text-base">Total</th>
                                         <td className="px-6 py-3">{details.reduce((total, detail) => total + detail.detail_quantity, 0)}</td>
                                         <td className="px-6 py-3">{details.reduce((total, detail) => total + detail.detail_price, 0)}</td>
-                                        <td className="px-6 py-3">{details.reduce((total, detail) => total + detail.detail_price*detail.detail_quantity, 0)}</td>
+                                        <td className="px-6 py-3">{details.reduce((total, detail) => total + detail.detail_price * detail.detail_quantity, 0)}</td>
                                     </tr>
                                 ) : (
                                     <tr>

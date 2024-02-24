@@ -8,12 +8,14 @@ import { Button } from '@material-tailwind/react';
 import CreateorderModal from './../Modal/CreateorderModal';
 import EdituserModal from './../Modal/EditorderModal';
 import DetailorderModal from './../Modal/DetailorderModal';
+import ActiveorderModal from '../Modal/ActiveorderModal';
 
 
 const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
     const [createOrderModalOpen, setCreateOrderModalOpen] = useState(false);
     const [editOrderModalOpen, setEditOrderModalOpen] = useState(false);
     const [detailOrderModalOpen, setDetailOrderModalOpen] = useState(false);
+    const [activeOrderModalOpen, setActiveOrderModalOpen] = useState(false);
     const [orders, setOrders] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalOrders, setTotalOrders] = useState(0);
@@ -38,6 +40,16 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
     const closeDetailOrderModal = () => {
         setSelectedOrder(null);
         setDetailOrderModalOpen(false);
+    };
+
+    const openActiveOrderModal = (order) => {
+        setSelectedOrder(order);
+        setActiveOrderModalOpen(true);
+    };
+
+    const closeActiveOrderModal = () => {
+        setSelectedOrder(null);
+        setActiveOrderModalOpen(false);
     };
 
     useEffect(() => {
@@ -168,7 +180,7 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                     <thead className="text-xs text-gray-400 uppercase bg-gray-700 dark:bg-gray-50 dark:text-gray-700">
                         <tr>
                             <th scope="col" className="p-4">
-                            <div className="flex items-center">
+                                <div className="flex items-center">
                                     <input
                                         id="checkbox-all-search"
                                         type="checkbox"
@@ -258,8 +270,25 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                                     <td className="px-6 py-4">
                                         {order.order_state}
                                     </td>
-                                    <td className="px-6 py-4">
-                                        {order.order_status}
+                                    <td className="flex items-center justify-between px-6 py-4">
+                                        <div className="flex items-center space-x-2">
+                                            {order.order_status === 'Active' ? (
+                                                <span className="relative flex h-3 w-3">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                                </span>
+                                            ) : (
+                                                <span className="relative flex h-3 w-3">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                                </span>
+                                            )}
+                                            {order.order_status}
+                                            <FiEdit
+                                                className='hover:text-blue-500'
+                                                onClick={() => openActiveOrderModal(order)} />
+                                        </div>
+                                        <ActiveorderModal open={activeOrderModalOpen} onClose={closeActiveOrderModal} orderId={selectedOrder?.order_id} orderNo={selectedOrder?.order_num} />
                                     </td>
                                     <td className="px-6 py-4">
                                         {order.total_price}
@@ -278,7 +307,7 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5" className="text-center text-gray-500 dark:text-gray-400 py-4">
+                                <td colSpan="8" className="text-center text-gray-500 dark:text-gray-400 py-4">
                                     No users found.
                                 </td>
                             </tr>
