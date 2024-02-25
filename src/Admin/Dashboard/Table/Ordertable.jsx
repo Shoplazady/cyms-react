@@ -273,15 +273,12 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                                     <td className="flex items-center justify-between px-6 py-4">
                                         <div className="flex items-center space-x-2">
                                             {order.order_status === 'Active' ? (
-                                                <span className="relative flex h-3 w-3">
+                                                <span className="relative flex h-3 w-3 me-1">
                                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                                     <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                                                 </span>
                                             ) : (
-                                                <span className="relative flex h-3 w-3">
-                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                                                </span>
+                                                <div className="h-2.5 w-2.5 rounded-full bg-red-500 me-1"></div>
                                             )}
                                             {order.order_status}
                                             <FiEdit
