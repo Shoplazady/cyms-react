@@ -570,7 +570,7 @@ app.delete('/api/admin/deleteorder/:orderId', async (req, res) => {
         }
 
         
-        await queryPromise('DELETE FROM detail_order WHERE order_id = ?', [orderId]);
+        await queryPromise('DELETE FROM order_detail WHERE order_id = ?', [orderId]);
 
         
         await queryPromise('DELETE FROM orders WHERE order_id = ?', [orderId]);

@@ -9,6 +9,8 @@ import CreateorderModal from './../Modal/CreateorderModal';
 import EdituserModal from './../Modal/EditorderModal';
 import DetailorderModal from './../Modal/DetailorderModal';
 import ActiveorderModal from '../Modal/ActiveorderModal';
+import DeleteorderModal from '../Modal/DeleteorderModal';
+import { IoTrashBin } from "react-icons/io5";
 
 
 const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
@@ -16,6 +18,7 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
     const [editOrderModalOpen, setEditOrderModalOpen] = useState(false);
     const [detailOrderModalOpen, setDetailOrderModalOpen] = useState(false);
     const [activeOrderModalOpen, setActiveOrderModalOpen] = useState(false);
+    const [deleteOrderModalOpen, setDeleteOrderModalOpen] = useState(false);
     const [orders, setOrders] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalOrders, setTotalOrders] = useState(0);
@@ -50,6 +53,16 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
     const closeActiveOrderModal = () => {
         setSelectedOrder(null);
         setActiveOrderModalOpen(false);
+    };
+
+    const openDeleteOrderModal = (order) => {
+        setSelectedOrder(order);
+        setDeleteOrderModalOpen(true);
+    };
+
+    const closeDeleteOrderModal = () => {
+        setSelectedOrder(null);
+        setDeleteOrderModalOpen(false);
     };
 
     useEffect(() => {
@@ -290,15 +303,37 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                                     <td className="px-6 py-4">
                                         {order.total_price}
                                     </td>
-                                    <td className="flex items-center space-x-3 px-6 py-4">
-                                        <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
-                                            onClick={openEditOrderModal}>
-                                            <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
-                                                Edit
-                                            </span>
-                                        </Button>
+                                    <td className="flex items-center px-6 py-4">
+                                        {/* Edit Button */}
+                                        <div className="button-container">
+                                            <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
+                                                onClick={openEditOrderModal}>
+                                                <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
+                                                    Edit
+                                                </span>
+                                            </Button>
+                                        </div>
+                                        {/* Delete Button */}
+                                        <div className="button-container">
+                                            <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
+                                            onClick={() => openDeleteOrderModal(order)} >
+                                                <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
+                                                    <IoTrashBin className='text-red-500 w-5 h-5' />
+                                                </span>
+                                            </Button>
+                                        </div>
+
+                                        {/* Print Button */}
+                                        <div className="button-container">
+                                            <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800">
+                                                <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
+                                                    <MdLocalPrintshop className='w-5 h-5' />
+                                                </span>
+                                            </Button>
+                                        </div>
+
                                         <EdituserModal open={editOrderModalOpen} onClose={closeEditOrderModal} />
-                                        <MdLocalPrintshop className='w-5 h-5' />
+                                        <DeleteorderModal open={deleteOrderModalOpen} onClose={closeDeleteOrderModal} orderId={selectedOrder?.order_id} orderNo={selectedOrder?.order_num}  />
                                     </td>
                                 </tr>
                             ))
