@@ -13,16 +13,16 @@ const PORT = 3001;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/user_pic', express.static(path.join(__dirname, 'user_pic')));
-app.use('/images_order', express.static(path.join(__dirname, 'images_order')));
+app.use('/user_pic', express.static(path.join(__dirname, 'src', 'uploads', 'user_pic')));
+app.use('/images_order', express.static(path.join(__dirname, 'src', 'uploads', 'images_order')));
 
 
 // MySQL Connection
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '', // Use environment variables for sensitive data
-    database: 'Trrsk',
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'Trrsk',
 });
 
 db.connect((err) => {
@@ -42,6 +42,7 @@ const queryPromise = (sql, values) => {
     return new Promise((resolve, reject) => {
         db.query(sql, values, (error, results, fields) => {
             if (error) {
+                console.error('Database error:', error);
                 reject(error);
             } else {
                 resolve(results);
@@ -52,7 +53,7 @@ const queryPromise = (sql, values) => {
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, file.fieldname === 'profilePic' ? 'user_pic' : 'images_order');
+        cb(null, file.fieldname === 'profilePic' ? 'src/uploads/user_pic' : 'src/uploads/images_order');
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -183,19 +184,26 @@ app.get('/api/admin/getuser/:userId', async (req, res) => {
     }
 });
 
-app.put('/api/admin/updateuser/:userId', upload.single('profilePicture'), async (req, res) => {
+app.put('/api/admin/updateuser/:userId', upload.single('profilePic'), async (req, res) => {
     try {
         const userId = req.params.userId;
         const updatedUserData = req.body;
 
         // Check if a file was uploaded
         if (req.file) {
-            
+            // Update the 'picture' field with the new file path
             updatedUserData.picture = req.file.filename;
         }
 
-        const updateQuery = await queryPromise('UPDATE users SET first_name=?, last_name=?, email=?, position=?, agency=?, tel_num=?, picture=? WHERE id=?',
-            [updatedUserData.first_name, updatedUserData.last_name, updatedUserData.email, updatedUserData.position, updatedUserData.agency, updatedUserData.tel_num, updatedUserData.picture, userId]);
+        // Use a conditional update based on whether a file was uploaded
+        const updateQuery = await queryPromise(
+            req.file
+                ? 'UPDATE users SET first_name=?, last_name=?, email=?, position=?, agency=?, tel_num=?, picture=? WHERE id=?'
+                : 'UPDATE users SET first_name=?, last_name=?, email=?, position=?, agency=?, tel_num=? WHERE id=?',
+            req.file
+                ? [updatedUserData.first_name, updatedUserData.last_name, updatedUserData.email, updatedUserData.position, updatedUserData.agency, updatedUserData.tel_num, updatedUserData.picture, userId]
+                : [updatedUserData.first_name, updatedUserData.last_name, updatedUserData.email, updatedUserData.position, updatedUserData.agency, updatedUserData.tel_num, userId]
+        );
 
         if (updateQuery.affectedRows === 1) {
             res.status(200).json({ message: 'User updated successfully.' });
@@ -216,7 +224,7 @@ app.post('/api/admin/adduser', upload.single('profilePic'), async (req, res) => 
         const hashedPassword = await bcrypt.hash(password, 10);
 
         
-        const picture_path = req.file ? `/user_pic/${req.file.filename}` : null;
+        const picture_path = req.file ? `/uploads/user_pic/${req.file.filename}` : null;
 
         
         const result = await queryPromise('SELECT * FROM users WHERE email = ?', [email]);
@@ -517,7 +525,7 @@ app.post('/api/admin/createorderanduploadimages', upload.array('detailPath'), as
         const insertOrderDetailsQuery = await Promise.all(
             orders.map(async (order, index) => {
                 const { itemName, quantity, price, link } = order;
-                const detailPath = req.files[index] ? `/images_order/${req.files[index].filename}` : null;
+                const detailPath = req.files[index] ? `/uploads/images_order/${req.files[index].filename}` : null;
                 const insertDetailQuery = await queryPromise('INSERT INTO order_detail (order_id, detail_name, detail_quantity, detail_price, detail_url, detail_path, detail_create) VALUES (?, ?, ?, ?, ?, ?, NOW())', [orderId, itemName, quantity, price, link, detailPath]);
                 return insertDetailQuery.insertId; // Return the detail_id
             })
