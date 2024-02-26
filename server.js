@@ -13,8 +13,7 @@ const PORT = 3001;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/user_pic', express.static(path.join(__dirname, 'src', 'uploads', 'user_pic')));
-app.use('/images_order', express.static(path.join(__dirname, 'src', 'uploads', 'images_order')));
+app.use(express.static('public'));
 
 
 // MySQL Connection
@@ -53,7 +52,7 @@ const queryPromise = (sql, values) => {
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, file.fieldname === 'profilePic' ? 'src/uploads/user_pic' : 'src/uploads/images_order');
+        cb(null, file.fieldname === 'profilePic' ? 'public/uploads/user_pic' : 'public/uploads/images_order');
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);

@@ -64,7 +64,7 @@ const DetailorderModal = ({ open, onClose, detailId }) => {
     };
 
     return (
-        <Dialog open={open} handler={onClose} className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-opacity-5 text-gray-100 dark:text-gray-900">
+        <Dialog open={open} className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-opacity-5 text-gray-100 dark:text-gray-900">
             <div className="max-w-xl bg-gray-700 dark:bg-gray-100 p-1 rounded-md overflow-y-auto max-h-screen">
                 <DialogHeader>Edit Order {detailId} </DialogHeader>
                 <DialogBody>
@@ -97,99 +97,96 @@ const DetailorderModal = ({ open, onClose, detailId }) => {
                             </thead>
                             <tbody>
                                 {details.length > 0 ? (
-                                    details.map((detail, index) => (
-                                        <tr className="bg-gray-800 dark:bg-gray-100" key={detail.id}>
-                                            {editedDetails[detail.id] ? (
-                                                <>
-                                                    <td scope="row" className="px-6 py-4 whitespace-nowrap dark:text-gray-900">
-                                                        <input
-                                                            type="text"
-                                                            className="border-b border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 dark:text-gray-100"
-                                                            value={editedValues.detail_name || detail.detail_name}
-                                                            onChange={(e) => handleInputChange('detail_name', e.target.value)}
-                                                        />
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <input
-                                                            type="text"
-                                                            className="border-b border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 dark:text-gray-100"
-                                                            value={editedValues.detail_url || detail.detail_url}
-                                                            onChange={(e) => handleInputChange('detail_url', e.target.value)}
-                                                        />
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <input
-                                                            type="number"
-                                                            className="border-b border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 dark:text-gray-100"
-                                                            value={editedValues.detail_quantity || detail.detail_quantity}
-                                                            onChange={(e) => handleInputChange('detail_quantity', e.target.value)}
-                                                        />
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <input
-                                                            type="number"
-                                                            className="border-b border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 dark:text-gray-100"
-                                                            value={editedValues.detail_price || detail.detail_price}
-                                                            onChange={(e) => handleInputChange('detail_price', e.target.value)}
-                                                        />
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        {detail.detail_price * detail.detail_quantity}
-                                                    </td>
-                                                    <td className="flex items-center px-6 py-4 space-x-3">
-                                                        <FiCheckCircle
-                                                            className='w-5 h-5 text-green-500 hover:text-green-700 cursor-pointer'
-                                                            onClick={() => handleSaveEdit(detail.id)}
-                                                        />
-                                                        <RiDeleteBin6Fill
-                                                            className='w-5 h-5 text-red-500 hover:text-red-700 cursor-pointer'
-                                                            onClick={handleCancelEdit}
-                                                        />
-                                                    </td>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <td className="px-6 py-4">
-                                                        <div className="relative">
-                                                            <img
-                                                                src={require(`./../../..${detail.detail_path}`)}
-                                                                alt={detail.detail_name}
-                                                                className="w-16 h-16 object-cover rounded-md"
+                                    details.map((detail, index) => {
+
+                                        return (
+
+                                            <tr className="bg-gray-800 dark:bg-gray-100" key={detail.id}>
+                                                {editedDetails[detail.id] ? (
+                                                    <>
+                                                        <td className="px-6 py-4 whitespace-nowrap dark:text-gray-900">
+                                                            <input
+                                                                type="text"
+                                                                className="border-b border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 dark:text-gray-100"
+                                                                value={editedValues.detail_name || detail.detail_name}
+                                                                onChange={(e) => handleInputChange('detail_name', e.target.value)}
                                                             />
-                                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <input
+                                                                type="text"
+                                                                className="border-b border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 dark:text-gray-100"
+                                                                value={editedValues.detail_url || detail.detail_url}
+                                                                onChange={(e) => handleInputChange('detail_url', e.target.value)}
+                                                            />
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <input
+                                                                type="number"
+                                                                className="border-b border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 dark:text-gray-100"
+                                                                value={editedValues.detail_quantity || detail.detail_quantity}
+                                                                onChange={(e) => handleInputChange('detail_quantity', e.target.value)}
+                                                            />
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <input
+                                                                type="number"
+                                                                className="border-b border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 dark:text-gray-100"
+                                                                value={editedValues.detail_price || detail.detail_price}
+                                                                onChange={(e) => handleInputChange('detail_price', e.target.value)}
+                                                            />
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            {detail.detail_price * detail.detail_quantity}
+                                                        </td>
+                                                        <td className="flex items-center px-6 py-4 space-x-3">
+                                                            <FiCheckCircle
+                                                                className='w-5 h-5 text-green-500 hover:text-green-700 cursor-pointer'
+                                                                onClick={() => handleSaveEdit(detail.id)}
+                                                            />
+                                                            <RiDeleteBin6Fill
+                                                                className='w-5 h-5 text-red-500 hover:text-red-700 cursor-pointer'
+                                                                onClick={handleCancelEdit}
+                                                            />
+                                                        </td>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <td className="px-6 py-4">
+                                                            <div className="relative">
                                                                 <img
-                                                                    src={require(`./../../..${detail.detail_path}`)}
+                                                                    src={`${detail.detail_path}`}
                                                                     alt={detail.detail_name}
-                                                                    className="max-w-full max-h-full"
+                                                                    className="w-16 h-16 object-cover rounded-md"
                                                                 />
                                                             </div>
-                                                        </div>
-                                                    </td>
-                                                    <td scope="row" className="px-6 py-4 font-medium text-gray-50 whitespace-nowrap dark:text-gray-900">
-                                                        {detail.detail_name}
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        URL
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        {detail.detail_quantity}
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        {detail.detail_price}
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        {detail.detail_price * detail.detail_quantity}
-                                                    </td>
-                                                    <td className="flex items-center px-6 py-4 space-x-3">
-                                                        <FiEdit
-                                                            className='w-5 h-5 text-blue-500 hover:text-blue-700 cursor-pointer'
-                                                            onClick={() => handleEdit(detail.id)}
-                                                        />
-                                                    </td>
-                                                </>
-                                            )}
-                                        </tr>
-                                    ))
+                                                        </td>
+                                                        <td className="px-6 py-4 font-medium text-gray-50 whitespace-nowrap dark:text-gray-900">
+                                                            {detail.detail_name}
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            URL
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            {detail.detail_quantity}
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            {detail.detail_price}
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            {detail.detail_price * detail.detail_quantity}
+                                                        </td>
+                                                        <td className="flex items-center px-6 py-4 space-x-3">
+                                                            <FiEdit
+                                                                className='w-5 h-5 text-blue-500 hover:text-blue-700 cursor-pointer'
+                                                                onClick={() => handleEdit(detail.id)}
+                                                            />
+                                                        </td>
+                                                    </>
+                                                )}
+                                            </tr>
+                                        );
+                                    })
                                 ) : (
                                     <tr>
                                         <td colSpan="8" className="text-center text-gray-500 dark:text-gray-400 py-4">
