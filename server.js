@@ -8,7 +8,6 @@ const multer = require('multer');
 const path = require('path');
 
 const app = express();
-const PORT = 3001;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -589,6 +588,24 @@ app.delete('/api/admin/deleteorder/:orderId', async (req, res) => {
     }
 });
 
+app.put('/api/admin/editdetailimages/:detail_id', upload.single('detailPath'), async (req, res) => {
+    try {
+        const id = req.params.detail_id;
+
+
+        const updatedImagePath = req.file ? `/uploads/images_order/${req.file.filename}` : null;
+       
+         const updateQuery = 'UPDATE order_detail SET detail_path = ? WHERE detail_id = ?';
+         await queryPromise(updateQuery, [updatedImagePath, id]);
+
+        res.status(200).json({ success: true, message: 'Detail image updated successfully.', updatedImagePath });
+    } catch (error) {
+        console.error('Error updating detail image:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+const PORT = 3001;
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
