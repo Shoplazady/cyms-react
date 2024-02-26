@@ -1,47 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@material-tailwind/react';
 import Select from 'react-select';
-import { FaPlus, FaMinus, FaLink } from "react-icons/fa";
-import { RiDeleteBin6Fill } from "react-icons/ri";
-import { MdAttachFile } from "react-icons/md";
+import { FaPlus, FaMinus, FaLink } from 'react-icons/fa';
+import { RiDeleteBin6Fill } from 'react-icons/ri';
+import { MdAttachFile } from 'react-icons/md';
 
-const EditorderModal = ({ open, onClose }) => {
+const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
 
+    const [users, setUsers] = useState([]);
     const [selectedOption, setSelectedOption] = useState(null);
-
-    const options = [
-        { value: 'united_states', label: 'United States' },
-        { value: 'canada', label: 'Canada' },
-        { value: 'france', label: 'France' },
-        { value: 'america', label: 'America' },
-
-    ];
-
-    const handleSelectChange = (selectedOption) => {
-        setSelectedOption(selectedOption);
-    };
-
-    const [orders, setOrders] = useState([
-        { id: 1, itemName: '', link: '', price: '', quantity: 1 },
-    ]);
-
+    const [orders, setOrders] = useState([{ id: 1, itemName: '', link: '', price: '', quantity: 1 }]);
     const [showLinkInput, setShowLinkInput] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
 
+    useEffect(() => {
+        fetchUsersForSelectOptions();
+        // Fetch order details for the given orderId and orderUid
+        if (orderId && orderUid) {
+            fetchOrderDetails(orderId, orderUid);
+        }
+    }, [orderId, orderUid]);
+
+    const fetchUsersForSelectOptions = async () => {
+        try {
+            const response = await fetch('http://localhost:3001/api/admin/users/options');
+            if (response.ok) {
+                const data = await response.json();
+                setUsers(data.users);
+            } else {
+                console.error('Failed to fetch users for select options:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error fetching users for select options:', error);
+        }
+    };
+
+    const fetchOrderDetails = async (orderId, orderUid) => {
+        try {
+            const response = await fetch(`http://localhost:3001/api/admin/detail/${orderUid}`);
+            if (response.ok) {
+                const data = await response.json();
+                // Handle the fetched order details
+                console.log(data.details);
+            } else {
+                console.error('Failed to fetch order details:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error fetching order details:', error);
+        }
+    };
+
     const handleIncrement = (id) => {
         setOrders((prevOrders) =>
-            prevOrders.map((order) =>
-                order.id === id ? { ...order, quantity: order.quantity + 1 } : order
-            )
+            prevOrders.map((order) => (order.id === id ? { ...order, quantity: order.quantity + 1 } : order))
         );
     };
 
     const handleDecrement = (id) => {
         setOrders((prevOrders) =>
             prevOrders.map((order) =>
-                order.id === id && order.quantity > 1
-                    ? { ...order, quantity: order.quantity - 1 }
-                    : order
+                order.id === id && order.quantity > 1 ? { ...order, quantity: order.quantity - 1 } : order
             )
         );
     };
@@ -62,29 +80,31 @@ const EditorderModal = ({ open, onClose }) => {
     };
 
     const calculateTotal = () => {
-        return orders.reduce((total, order) => total + order.price * order.quantity, 0);
+        return orders.reduce((total, order) => total + (order.price || 0) * order.quantity, 0);
     };
 
     return (
-        <Dialog open={open} handler={onClose} className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-opacity-5 text-gray-100 dark:text-gray-900">
+        <Dialog open={open} onClose={onClose} className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-opacity-5 text-gray-100 dark:text-gray-900">
             <div className="lg:w-1/2 md:w-full bg-gray-700 dark:bg-gray-100 p-8 rounded-md overflow-y-auto max-h-screen">
-                <DialogHeader>Add new order</DialogHeader>
-                <DialogBody className='text-gray-100 dark:text-gray-900 overflow-y-auto max-h-lg'>
+                <DialogHeader>Edit order ID: {orderId} and UID: {orderUid}</DialogHeader>
+                <DialogBody className="text-gray-100 dark:text-gray-900 overflow-y-auto max-h-lg">
                     <form>
-                        <div class="mb-6">
-                            <label for="employee_name" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Employee name</label>
+                        <div className="mb-6">
+                            <label htmlFor="employee_name" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">
+                                Employee name
+                            </label>
                             <Select
-                                id="em_name"
+                                className="text-black"
+                                options={users.map((user) => ({ value: user.id, label: `${user.first_name} ${user.last_name}` }))}
+                                onChange={(selected) => setSelectedOption(selected)}
                                 value={selectedOption}
-                                onChange={handleSelectChange}
-                                options={options}
-                                isSearchable
-                                className="text-gray-900 dark:text-gray-800 bg-gray-700 border border-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="Search for a Employee..."
+                                placeholder="Select a user..."
                             />
                         </div>
                         <div className="mb-6">
-                            <label for="orderAdd" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">Order Add</label>
+                            <label htmlFor="orderAdd" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">
+                                Order Add
+                            </label>
                             {orders.map((order) => (
                                 <div className="mb-6 space-y-4" key={order.id}>
                                     {/* Row 1: Item Name and Picture */}
@@ -97,9 +117,7 @@ const EditorderModal = ({ open, onClose }) => {
                                             value={order.itemName}
                                             onChange={(e) =>
                                                 setOrders((prevOrders) =>
-                                                    prevOrders.map((o) =>
-                                                        o.id === order.id ? { ...o, itemName: e.target.value } : o
-                                                    )
+                                                    prevOrders.map((o) => (o.id === order.id ? { ...o, itemName: e.target.value } : o))
                                                 )
                                             }
                                             required
@@ -121,9 +139,7 @@ const EditorderModal = ({ open, onClose }) => {
                                                 value={order.link}
                                                 onChange={(e) =>
                                                     setOrders((prevOrders) =>
-                                                        prevOrders.map((o) =>
-                                                            o.id === order.id ? { ...o, link: e.target.value } : o
-                                                        )
+                                                        prevOrders.map((o) => (o.id === order.id ? { ...o, link: e.target.value } : o))
                                                     )
                                                 }
                                             />
@@ -151,7 +167,7 @@ const EditorderModal = ({ open, onClose }) => {
                                     </div>
 
                                     {/* Row 2: Price and Quantity */}
-                                    <div className="relative flex items-center space-x-1 max-w-[8rem]" >
+                                    <div className="relative flex items-center space-x-1 max-w-[8rem]">
                                         <input
                                             type="text"
                                             id={`price-${order.id}`}
@@ -160,9 +176,7 @@ const EditorderModal = ({ open, onClose }) => {
                                             value={order.price}
                                             onChange={(e) =>
                                                 setOrders((prevOrders) =>
-                                                    prevOrders.map((o) =>
-                                                        o.id === order.id ? { ...o, price: e.target.value } : o
-                                                    )
+                                                    prevOrders.map((o) => (o.id === order.id ? { ...o, price: e.target.value } : o))
                                                 )
                                             }
                                             required
@@ -204,23 +218,21 @@ const EditorderModal = ({ open, onClose }) => {
                             <FaPlus className="w-6 h-6" onClick={handleAddOrder} />
                         </div>
                     </form>
-                </DialogBody >
-                <DialogFooter className='flex justify-between items-center'>
-                    <div className="text-white dark:text-gray-900">
-                        Total Price: {calculateTotal().toFixed(2)}
-                    </div>
+                </DialogBody>
+                <DialogFooter className="flex justify-between items-center">
+                    <div className="text-white dark:text-gray-900">Total Price: {calculateTotal().toFixed(2)}</div>
                     <div>
-                        <Button onClick={onClose} className="mr-1 bg-red-600 text-gray-100 font-medium hover:bg-red-700">
-                            <span>Cancel</span>
+                        <Button onClick={onClose} color="red" ripple="light" className="mr-1">
+                            Cancel
                         </Button>
-                        <Button onClick={onClose} className="bg-green-500 font-medium text-gray-100 hover:bg-green-600">
-                            <span>Confirm</span>
+                        <Button onClick={onClose} color="green" ripple="light">
+                            Confirm
                         </Button>
                     </div>
                 </DialogFooter>
-            </div >
-        </Dialog >
+            </div>
+        </Dialog>
     );
 };
 
-export default EditorderModal;
+export default EditOrderModal;

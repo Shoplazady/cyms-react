@@ -443,7 +443,8 @@ app.get('/api/admin/orders', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const ordersPerPage = parseInt(req.query.ordersPerPage) || 10;
-        const searchTerm = req.query.searchTerm || ''; // Retrieve the search term from the query parameters
+        const searchTerm = req.query.searchTerm || ''; 
+        
 
         // Calculate offset
         const offset = (page - 1) * ordersPerPage;
@@ -452,6 +453,7 @@ app.get('/api/admin/orders', async (req, res) => {
         const ordersQuery = await queryPromise(`
             SELECT
                 orders.order_id,
+                orders.user_id AS order_uid,
                 orders.order_num,
                 users.first_name,
                 users.last_name,
@@ -495,6 +497,19 @@ app.get('/api/admin/orders', async (req, res) => {
     } catch (error) {
         console.error('Error retrieving order data:', error);
         res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+app.get('/api/admin/order/:orderId', async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const orderQuery = await queryPromise('SELECT * FROM orders WHERE order_id = ?', [orderId]);
+        const orderDetailsQuery = await queryPromise('SELECT * FROM order_detail WHERE order_id = ?', [orderId]);
+
+        res.status(200).json({ order: orderQuery[0], orderDetails: orderDetailsQuery });
+    } catch (error) {
+        console.error('Error fetching order data:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
@@ -590,17 +605,28 @@ app.delete('/api/admin/deleteorder/:orderId', async (req, res) => {
 
 app.put('/api/admin/editdetailimages/:detail_id', upload.single('detailPath'), async (req, res) => {
     try {
-        const id = req.params.detail_id;
+        const detailId = req.params.detail_id;
 
+        // Fetch existing order detail data
+        const currentDetailQuery = await queryPromise('SELECT * FROM order_detail WHERE detail_id = ?', [detailId]);
+        const currentDetail = currentDetailQuery[0];
 
-        const updatedImagePath = req.file ? `/uploads/images_order/${req.file.filename}` : null;
-       
-         const updateQuery = 'UPDATE order_detail SET detail_path = ? WHERE detail_id = ?';
-         await queryPromise(updateQuery, [updatedImagePath, id]);
+        // Update the necessary fields based on your requirements
+        const updatedDetail = {
+            detail_name: req.body.detail_name || currentDetail.detail_name,
+            detail_quantity: req.body.detail_quantity || currentDetail.detail_quantity,
+            detail_price: req.body.detail_price || currentDetail.detail_price,
+            detail_url: req.body.detail_url || currentDetail.detail_url,
+            // Add more fields as needed
+        };
 
-        res.status(200).json({ success: true, message: 'Detail image updated successfully.', updatedImagePath });
+        // Perform the database update with the new data
+        const updateQuery = 'UPDATE order_detail SET detail_name = ?, detail_quantity = ?, detail_price = ?, detail_url = ? WHERE detail_id = ?';
+        await queryPromise(updateQuery, [updatedDetail.detail_name, updatedDetail.detail_quantity, updatedDetail.detail_price, updatedDetail.detail_url, detailId]);
+
+        res.status(200).json({ success: true, message: 'Order detail updated successfully.', updatedDetail });
     } catch (error) {
-        console.error('Error updating detail image:', error);
+        console.error('Error updating order detail:', error);
         res.status(500).json({ error: 'Internal server error.' });
     }
 });

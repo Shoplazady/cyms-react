@@ -32,8 +32,16 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
     const openCreateOrderModal = () => setCreateOrderModalOpen(true);
     const closeCreateOrderModal = () => setCreateOrderModalOpen(false);
 
-    const openEditOrderModal = () => setEditOrderModalOpen(true);
-    const closeEditOrderModal = () => setEditOrderModalOpen(false);
+    const openEditOrderModal = (order) => {
+        setSelectedOrder(order);
+        setEditOrderModalOpen(true);
+    };
+
+    const closeEditOrderModal = () => {
+        setSelectedOrder(null);
+        setEditOrderModalOpen(false);
+    };
+
 
     const openDetailOrderModal = (order) => {
         setSelectedOrder(order);
@@ -307,7 +315,7 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                                         {/* Edit Button */}
                                         <div className="button-container">
                                             <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
-                                                onClick={openEditOrderModal}>
+                                                onClick={() => openEditOrderModal(order)}>
                                                 <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
                                                     Edit
                                                 </span>
@@ -316,7 +324,7 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                                         {/* Delete Button */}
                                         <div className="button-container">
                                             <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
-                                            onClick={() => openDeleteOrderModal(order)} >
+                                                onClick={() => openDeleteOrderModal(order)} >
                                                 <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
                                                     <IoTrashBin className='text-red-500 w-5 h-5' />
                                                 </span>
@@ -332,8 +340,8 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                                             </Button>
                                         </div>
 
-                                        <EdituserModal open={editOrderModalOpen} onClose={closeEditOrderModal} />
-                                        <DeleteorderModal open={deleteOrderModalOpen} onClose={closeDeleteOrderModal} orderId={selectedOrder?.order_id} orderNo={selectedOrder?.order_num}  />
+                                        <EdituserModal open={editOrderModalOpen} onClose={closeEditOrderModal} orderId={selectedOrder?.order_id} orderUid={selectedOrder?.order_uid} />
+                                        <DeleteorderModal open={deleteOrderModalOpen} onClose={closeDeleteOrderModal} orderId={selectedOrder?.order_id} orderNo={selectedOrder?.order_num} />
                                     </td>
                                 </tr>
                             ))
