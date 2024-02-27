@@ -8,18 +8,30 @@ import { MdAttachFile } from 'react-icons/md';
 const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
 
     const [users, setUsers] = useState([]);
-    const [selectedOption, setSelectedOption] = useState(null);
-    const [orders, setOrders] = useState([{ id: 1, itemName: '', link: '', price: '', quantity: 1 }]);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [orders, setOrders] = useState([]);
     const [showLinkInput, setShowLinkInput] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
+    const [orderDetails, setOrderDetails] = useState([]);
 
     useEffect(() => {
         fetchUsersForSelectOptions();
+    }, []);
+
+    useEffect(() => {
         // Fetch order details for the given orderId and orderUid
         if (orderId && orderUid) {
             fetchOrderDetails(orderId, orderUid);
         }
-    }, [orderId, orderUid]);
+        // Set the selected user based on orderUid
+        const user = users.find((user) => user.id === orderUid);
+        if (user) {
+            setSelectedUser({ value: user.id, label: `${user.first_name} ${user.last_name}` });
+        }
+
+        setOrders([]);
+
+    }, [orderId, orderUid, users]);
 
     const fetchUsersForSelectOptions = async () => {
         try {
@@ -35,13 +47,15 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
         }
     };
 
-    const fetchOrderDetails = async (orderId, orderUid) => {
+    const fetchOrderDetails = async (orderId) => {
         try {
-            const response = await fetch(`http://localhost:3001/api/admin/detail/${orderUid}`);
+            const response = await fetch(`http://localhost:3001/api/admin/detail/${orderId}`);
             if (response.ok) {
                 const data = await response.json();
-                // Handle the fetched order details
+
                 console.log(data.details);
+
+                setOrderDetails(data.details);
             } else {
                 console.error('Failed to fetch order details:', response.statusText);
             }
@@ -49,6 +63,22 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
             console.error('Error fetching order details:', error);
         }
     };
+
+    useEffect(() => {
+        // If orderDetails is available, map it to the structure of orders and add it
+        if (orderDetails && orderDetails.length > 0) {
+            const newOrders = orderDetails.map((detail, index) => ({
+                id: orders.length + index + 1,
+                detail_id: detail.detail_id,
+                itemName: detail.detail_name,
+                link: detail.detail_url || '',
+                price: detail.detail_price.toString(),
+                quantity: detail.detail_quantity,
+
+            }));
+            setOrders((prevOrders) => [...prevOrders, ...newOrders]);
+        }
+    }, [orderDetails]);
 
     const handleIncrement = (id) => {
         setOrders((prevOrders) =>
@@ -74,13 +104,62 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
     };
 
     const handleLinkLabelClick = (id) => {
-        // Toggle the visibility of the URL input field
+
         setShowLinkInput((prevShowLinkInput) => !prevShowLinkInput);
         setSelectedOrderId(id);
     };
 
     const calculateTotal = () => {
         return orders.reduce((total, order) => total + (order.price || 0) * order.quantity, 0);
+    };
+
+    useEffect(() => {
+        return () => {
+            setOrderDetails(null);
+        };
+    }, [open]);
+
+    const handleUpdateDetails = async () => {
+        try {
+            const formData = new FormData();
+
+            // Append user-related data
+            formData.append('user_id', selectedUser.value);
+            formData.append('order_id', orderId);
+
+            // Iterate through orders and append form data for each order
+            orders.forEach((order) => {
+                formData.append('detail_id[]', order.detail_id); // Include detail_id
+                formData.append('detail_name[]', order.itemName);
+                formData.append('detail_price[]', order.price);
+                formData.append('detail_quantity[]', order.quantity);
+                formData.append('detail_url[]', order.link);
+    
+                // Check if there's a picture file and append it
+                if (order.picture) {
+                    formData.append('picture[]', order.picture);
+                }
+                // Add other details as needed
+            });
+
+            const response = await fetch(`http://localhost:3001/api/admin/editdetailimages/${orderId}`, {
+                method: 'PUT',
+                body: formData,
+            });
+
+            if (response.ok) {
+                console.log('Details updated successfully.');
+                
+            } else {
+                console.error('Failed to update details:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error updating details:', error);
+        }
+
+        console.log('Updated Details:', orders);
+
+        onClose();
     };
 
     return (
@@ -96,8 +175,8 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
                             <Select
                                 className="text-black"
                                 options={users.map((user) => ({ value: user.id, label: `${user.first_name} ${user.last_name}` }))}
-                                onChange={(selected) => setSelectedOption(selected)}
-                                value={selectedOption}
+                                onChange={(selected) => setSelectedUser(selected)}
+                                value={selectedUser} // Set the selected user as the default value
                                 placeholder="Select a user..."
                             />
                         </div>
@@ -106,7 +185,16 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
                                 Order Add
                             </label>
                             {orders.map((order) => (
-                                <div className="mb-6 space-y-4" key={order.id}>
+                                <div className="mb-6 space-y-4">
+                                    <div key={`detailId-${order.id}`}>
+                                        <input
+                                            type="text"
+                                            id={`detailId-${order.id}`}
+                                            className="hidden"
+                                            value={order.detail_id}
+                                            readOnly
+                                        />
+                                    </div>
                                     {/* Row 1: Item Name and Picture */}
                                     <div className="flex items-center">
                                         <input
@@ -225,7 +313,7 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
                         <Button onClick={onClose} color="red" ripple="light" className="mr-1">
                             Cancel
                         </Button>
-                        <Button onClick={onClose} color="green" ripple="light">
+                        <Button onClick={handleUpdateDetails} color="green" ripple="light">
                             Confirm
                         </Button>
                     </div>

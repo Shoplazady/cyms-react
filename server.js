@@ -603,32 +603,8 @@ app.delete('/api/admin/deleteorder/:orderId', async (req, res) => {
     }
 });
 
-app.put('/api/admin/editdetailimages/:detail_id', upload.single('detailPath'), async (req, res) => {
-    try {
-        const detailId = req.params.detail_id;
-
-        // Fetch existing order detail data
-        const currentDetailQuery = await queryPromise('SELECT * FROM order_detail WHERE detail_id = ?', [detailId]);
-        const currentDetail = currentDetailQuery[0];
-
-        // Update the necessary fields based on your requirements
-        const updatedDetail = {
-            detail_name: req.body.detail_name || currentDetail.detail_name,
-            detail_quantity: req.body.detail_quantity || currentDetail.detail_quantity,
-            detail_price: req.body.detail_price || currentDetail.detail_price,
-            detail_url: req.body.detail_url || currentDetail.detail_url,
-            // Add more fields as needed
-        };
-
-        // Perform the database update with the new data
-        const updateQuery = 'UPDATE order_detail SET detail_name = ?, detail_quantity = ?, detail_price = ?, detail_url = ? WHERE detail_id = ?';
-        await queryPromise(updateQuery, [updatedDetail.detail_name, updatedDetail.detail_quantity, updatedDetail.detail_price, updatedDetail.detail_url, detailId]);
-
-        res.status(200).json({ success: true, message: 'Order detail updated successfully.', updatedDetail });
-    } catch (error) {
-        console.error('Error updating order detail:', error);
-        res.status(500).json({ error: 'Internal server error.' });
-    }
+app.put('/api/admin/editdetailimages/:detail_id', upload.array('detailPath'), async (req, res) => {
+    
 });
 
 const PORT = 3001;
