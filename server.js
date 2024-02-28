@@ -218,17 +218,17 @@ app.post('/api/admin/adduser', upload.single('profilePic'), async (req, res) => 
     const { first_name, last_name, position, agency, tel_num, email, password, level } = req.body;
 
     try {
-        
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        
+
         const picture_path = req.file ? `/uploads/user_pic/${req.file.filename}` : null;
 
-        
+
         const result = await queryPromise('SELECT * FROM users WHERE email = ?', [email]);
 
         if (!result || result.length === 0) {
-            
+
             await queryPromise('INSERT INTO users (first_name, last_name, position, agency, tel_num, email, password, level, picture_path, date_create) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())', [first_name, last_name, position, agency, tel_num, email, hashedPassword, level, picture_path]);
 
             res.status(201).json({ success: true, message: 'User registered successfully.' });
@@ -267,10 +267,10 @@ app.delete('/api/admin/deleteuser/:userId', async (req, res) => {
 
 app.get('/api/admin/job', async (req, res) => {
     try {
-        
+
         const result = await queryPromise('SELECT * FROM job_position');
 
-        
+
         res.status(200).json({ jobs: result, totalJobs: result.length });
     } catch (error) {
         console.error('Error fetching job data:', error);
@@ -354,10 +354,10 @@ app.delete('/api/admin/deletejob/:jobId', async (req, res) => {
 
 app.get('/api/admin/category', async (req, res) => {
     try {
-        
+
         const result = await queryPromise('SELECT * FROM category');
 
-        
+
         res.status(200).json({ categories: result, totalCategories: result.length });
     } catch (error) {
         console.error('Error fetching job data:', error);
@@ -430,7 +430,7 @@ app.delete('/api/admin/deletecategory/:categoryId', async (req, res) => {
         }
 
         // Delete the user
-        await queryPromise('DELETE FROM category WHERE cat_id',[categoryId]);
+        await queryPromise('DELETE FROM category WHERE cat_id', [categoryId]);
 
         res.status(200).json({ success: true, message: 'Category deleted successfully.' });
     } catch (error) {
@@ -443,8 +443,8 @@ app.get('/api/admin/orders', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const ordersPerPage = parseInt(req.query.ordersPerPage) || 10;
-        const searchTerm = req.query.searchTerm || ''; 
-        
+        const searchTerm = req.query.searchTerm || '';
+
 
         // Calculate offset
         const offset = (page - 1) * ordersPerPage;
@@ -530,6 +530,7 @@ app.post('/api/admin/createorderanduploadimages', upload.array('detailPath'), as
         const { userId, orders: ordersString } = req.body;
         const orders = JSON.parse(ordersString);
 
+
         // First, create the order
         const orderNum = generateOrderNumber();
         const insertOrderQuery = await queryPromise('INSERT INTO orders (order_num, user_id, order_status, order_state, order_create) VALUES (?, ?, ?, ?, NOW())', [orderNum, userId, 'Inactive', 'pending']);
@@ -583,17 +584,17 @@ app.delete('/api/admin/deleteorder/:orderId', async (req, res) => {
     console.log('Received request to delete order with ID:', orderId);
 
     try {
-        
+
         const orderResult = await queryPromise('SELECT * FROM orders WHERE order_id = ?', [orderId]);
 
         if (!orderResult || orderResult.length === 0) {
             return res.status(404).json({ error: 'Order not found.' });
         }
 
-        
+
         await queryPromise('DELETE FROM order_detail WHERE order_id = ?', [orderId]);
 
-        
+
         await queryPromise('DELETE FROM orders WHERE order_id = ?', [orderId]);
 
         res.status(200).json({ success: true, message: 'Order and related details deleted successfully.' });
@@ -603,8 +604,26 @@ app.delete('/api/admin/deleteorder/:orderId', async (req, res) => {
     }
 });
 
-app.put('/api/admin/editdetailimages/:detail_id', upload.array('detailPath'), async (req, res) => {
-    
+app.put('/api/admin/editdetailimages', upload.array('picture'), async (req, res) => {
+    try {
+        
+        const detailId = req.body.detail_id;
+        const userId = req.body.userId;
+        const orderId = req.body.orderId;
+        const ordersString = req.body.orders;
+        const orders = JSON.parse(ordersString);
+
+        // Handle file uploads
+        const uploadedFiles = req.files || [];
+
+        console.log(req.body);
+        console.log(req.files);
+
+        res.status(200).json({ message: 'Details updated successfully!' });
+    } catch (error) {
+        console.error('Error updating details:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
 });
 
 const PORT = 3001;

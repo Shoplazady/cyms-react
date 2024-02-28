@@ -4,8 +4,11 @@ import Select from 'react-select';
 import { FaPlus, FaMinus, FaLink } from 'react-icons/fa';
 import { RiDeleteBin6Fill } from 'react-icons/ri';
 import { MdAttachFile } from 'react-icons/md';
+import { useAlert } from './../../components/AlertContext';
 
 const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
+
+    const { showAlert } = useAlert();
 
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -65,16 +68,13 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
     };
 
     useEffect(() => {
-        // If orderDetails is available, map it to the structure of orders and add it
         if (orderDetails && orderDetails.length > 0) {
             const newOrders = orderDetails.map((detail, index) => ({
-                id: orders.length + index + 1,
-                detail_id: detail.detail_id,
+                id: detail.detail_id,
                 itemName: detail.detail_name,
                 link: detail.detail_url || '',
                 price: detail.detail_price.toString(),
                 quantity: detail.detail_quantity,
-
             }));
             setOrders((prevOrders) => [...prevOrders, ...newOrders]);
         }
@@ -115,51 +115,53 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
 
     useEffect(() => {
         return () => {
-            setOrderDetails(null);
+            setOrderDetails([]);
         };
     }, [open]);
 
     const handleUpdateDetails = async () => {
         try {
+            if (!selectedUser) {
+                showAlert('error', 'Please select a user.');
+                return;
+            }
+
+            if (orders.length === 0) {
+                showAlert('error', 'Please add at least one order.');
+                return;
+            }
+
+            const userId = selectedUser.value;
+
             const formData = new FormData();
+            formData.append('userId', userId);
+            formData.append('orderId', orderId);
 
-            // Append user-related data
-            formData.append('user_id', selectedUser.value);
-            formData.append('order_id', orderId);
+           
+            formData.append('orders', JSON.stringify(orders));
 
-            // Iterate through orders and append form data for each order
-            orders.forEach((order) => {
-                formData.append('detail_id[]', order.detail_id); // Include detail_id
-                formData.append('detail_name[]', order.itemName);
-                formData.append('detail_price[]', order.price);
-                formData.append('detail_quantity[]', order.quantity);
-                formData.append('detail_url[]', order.link);
-    
-                // Check if there's a picture file and append it
+            
+            orders.forEach((order, index) => {
                 if (order.picture) {
-                    formData.append('picture[]', order.picture);
+                    formData.append('picture', order.picture || null);
                 }
-                // Add other details as needed
             });
 
-            const response = await fetch(`http://localhost:3001/api/admin/editdetailimages/${orderId}`, {
+            console.log('FormData:', formData);
+            const editOrderResponse = await fetch(`http://localhost:3001/api/admin/editdetailimages`, {
                 method: 'PUT',
                 body: formData,
             });
 
-            if (response.ok) {
-                console.log('Details updated successfully.');
-                
+            if (editOrderResponse.ok) {
+                showAlert('success', 'Order updated successfully!');
+                onClose();
             } else {
-                console.error('Failed to update details:', response.statusText);
+                showAlert('error', `Failed to update order: ${editOrderResponse.statusText}`);
             }
         } catch (error) {
-            console.error('Error updating details:', error);
+            showAlert('error', `Error updating order: ${error.message}`);
         }
-
-        console.log('Updated Details:', orders);
-
-        onClose();
     };
 
     return (
@@ -176,7 +178,7 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
                                 className="text-black"
                                 options={users.map((user) => ({ value: user.id, label: `${user.first_name} ${user.last_name}` }))}
                                 onChange={(selected) => setSelectedUser(selected)}
-                                value={selectedUser} // Set the selected user as the default value
+                                value={selectedUser}
                                 placeholder="Select a user..."
                             />
                         </div>
@@ -184,18 +186,8 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
                             <label htmlFor="orderAdd" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">
                                 Order Add
                             </label>
-                            {orders.map((order) => (
-                                <div className="mb-6 space-y-4">
-                                    <div key={`detailId-${order.id}`}>
-                                        <input
-                                            type="text"
-                                            id={`detailId-${order.id}`}
-                                            className="hidden"
-                                            value={order.detail_id}
-                                            readOnly
-                                        />
-                                    </div>
-                                    {/* Row 1: Item Name and Picture */}
+                            {orders.map((order,index) => (
+                                <div className="mb-6 space-y-4" key={order.id}>
                                     <div className="flex items-center">
                                         <input
                                             type="text"
@@ -210,7 +202,6 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
                                             }
                                             required
                                         />
-                                        {/* Add Link URL */}
                                         <label
                                             htmlFor={`link-${order.id}`}
                                             className="ml-2 p-2 text-blue-500 hover:text-blue-700 cursor-pointer"
@@ -232,8 +223,6 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
                                                 }
                                             />
                                         )}
-
-                                        {/* Add  picture */}
                                         <label
                                             htmlFor={`file-${order.id}`}
                                             className="ml-2 p-2 text-blue-500 hover:text-blue-700 cursor-pointer"
@@ -243,18 +232,19 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
                                                 type="file"
                                                 id={`file-${order.id}`}
                                                 className="hidden"
-                                                onChange={(e) =>
+                                                onChange={(e) => {
+                                                    const selectedFile = e.target.files[0];
+                                                    console.log('Selected File:', selectedFile);
+                                                
                                                     setOrders((prevOrders) =>
                                                         prevOrders.map((o) =>
-                                                            o.id === order.id ? { ...o, picture: e.target.files[0] } : o
+                                                            o.id === order.id ? { ...o, picture: selectedFile } : o
                                                         )
-                                                    )
-                                                }
+                                                    );
+                                                }}
                                             />
                                         </label>
                                     </div>
-
-                                    {/* Row 2: Price and Quantity */}
                                     <div className="relative flex items-center space-x-1 max-w-[8rem]">
                                         <input
                                             type="text"

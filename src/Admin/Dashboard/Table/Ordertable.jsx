@@ -144,20 +144,20 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
 
     return (
 
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
 
             <nav className="flex p-3" aria-label="Breadcrumb">
-                <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
-                    <li class="inline-flex items-center">
-                        <Link to="/admin/" class="inline-flex items-center text-sm font-medium text-gray-50 hover:text-blue-600 dark:text-gray-900 dark:hover:text-blue-600">
+                <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+                    <li className="inline-flex items-center">
+                        <Link to="/admin/" className="inline-flex items-center text-sm font-medium text-gray-50 hover:text-blue-600 dark:text-gray-900 dark:hover:text-blue-600">
                             <AiFillDashboard className='w-3 h-3 me-2.5' />
                             Dashboard
                         </Link>
                     </li>
                     <li>
-                        <div class="flex items-center">
+                        <div className="flex items-center">
                             < MdOutlineKeyboardArrowRight className='w-6 h-6 text-gray-300' />
-                            <h6 class="ms-1 text-sm font-medium text-gray-50 hover:text-blue-600 md:ms-2 dark:text-gray-900 dark:hover:text-blue-600">Order</h6>
+                            <h6 className="ms-1 text-sm font-medium text-gray-50 hover:text-blue-600 md:ms-2 dark:text-gray-900 dark:hover:text-blue-600">Order</h6>
                         </div>
                     </li>
                 </ol>
@@ -214,43 +214,43 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                                     </label>
                                 </div>
                             </th>
-                            <th scope="col" class="px-6 py-3">
+                            <th scope="col" className="px-6 py-3">
                                 No.
                             </th>
-                            <th scope="col" class="px-6 py-3">
+                            <th scope="col" className="px-6 py-3">
                                 Employee name
                             </th>
-                            <th scope="col" class="px-6 py-3">
+                            <th scope="col" className="px-6 py-3">
                                 <div className="flex items-center">
                                     Order detail
                                     <FaArrowsUpDown className='w-3 h-3 ms-1.5' />
                                 </div>
                             </th>
-                            <th scope="col" class="px-6 py-3">
+                            <th scope="col" className="px-6 py-3">
                                 <div className="flex items-center">
                                     Date create
                                     <FaArrowsUpDown className='w-3 h-3 ms-1.5' />
                                 </div>
                             </th>
-                            <th scope="col" class="px-6 py-3">
+                            <th scope="col" className="px-6 py-3">
                                 <div className="flex items-center">
                                     State
                                     <FaArrowsUpDown className='w-3 h-3 ms-1.5' />
                                 </div>
                             </th>
-                            <th scope="col" class="px-6 py-3">
+                            <th scope="col" className="px-6 py-3">
                                 <div className="flex items-center">
                                     Status
                                     <FaArrowsUpDown className='w-3 h-3 ms-1.5' />
                                 </div>
                             </th>
-                            <th scope="col" class="px-6 py-3">
+                            <th scope="col" className="px-6 py-3">
                                 <div className="flex items-center">
                                     Price (฿)
                                     <FaArrowsUpDown className='w-3 h-3 ms-1.5' />
                                 </div>
                             </th>
-                            <th scope="col" class="px-6 py-3">
+                            <th scope="col" className="px-6 py-3">
                                 <span className="sr-only">Tool</span>
                             </th>
                         </tr>
@@ -258,7 +258,7 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                     <tbody>
                         {orders.length > 0 ? (
                             orders.map((order, index) => (
-                                <tr className="bg-gray-800 border-b border-gray-700 dark:bg-white dark:border-gray-200">
+                                <tr className="bg-gray-800 border-b border-gray-700 dark:bg-white dark:border-gray-200" key={order.id}>
                                     <td className="w-4 p-4">
                                         <div className="flex items-center">
                                             <input
