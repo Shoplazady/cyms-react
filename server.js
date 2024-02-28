@@ -530,7 +530,6 @@ app.post('/api/admin/createorderanduploadimages', upload.array('detailPath'), as
         const { userId, orders: ordersString } = req.body;
         const orders = JSON.parse(ordersString);
 
-
         // First, create the order
         const orderNum = generateOrderNumber();
         const insertOrderQuery = await queryPromise('INSERT INTO orders (order_num, user_id, order_status, order_state, order_create) VALUES (?, ?, ?, ?, NOW())', [orderNum, userId, 'Inactive', 'pending']);
@@ -606,22 +605,57 @@ app.delete('/api/admin/deleteorder/:orderId', async (req, res) => {
 
 app.put('/api/admin/editdetailimages', upload.array('picture'), async (req, res) => {
     try {
-        
-        const detailId = req.body.detail_id;
-        const userId = req.body.userId;
-        const orderId = req.body.orderId;
-        const ordersString = req.body.orders;
+        const { userId, orderId, orders: ordersString } = req.body;
         const orders = JSON.parse(ordersString);
 
-        // Handle file uploads
-        const uploadedFiles = req.files || [];
+        // Check if the order already exists for the given userId and orderId
+        const existingOrder = await queryPromise('SELECT * FROM orders WHERE user_id = ? AND order_id = ?', [userId, orderId]);
 
-        console.log(req.body);
-        console.log(req.files);
+        if (existingOrder.length > 0) {
+            // If the order already exists, update the user_id and order_status
+            await queryPromise('UPDATE orders SET user_id = ? WHERE order_id = ?', [userId, orderId]);
 
-        res.status(200).json({ message: 'Details updated successfully!' });
+            // Update or insert into the order_detail table for each order
+            const insertOrderDetailsQuery = await Promise.all(
+                orders.map(async (order, index) => {
+                    const { id, itemName, quantity, price, link } = order;
+                    const detailPath = req.files[index] ? `/uploads/images_order/${req.files[index].filename}` : null;
+
+                    // Check if the order_detail with this detail_id already exists
+                    const existingOrderDetail = await queryPromise('SELECT * FROM order_detail WHERE detail_id = ?', [id]);
+
+                    if (existingOrderDetail.length > 0) {
+                        // Update the existing order_detail
+                        await queryPromise('UPDATE order_detail SET detail_name = ?, detail_quantity = ?, detail_price = ?, detail_url = ?, detail_path = ? WHERE detail_id = ?', [itemName, quantity, price, link, detailPath, id]);
+                    } else {
+                        // Insert a new order_detail
+                        await queryPromise('INSERT INTO order_detail (order_id, detail_id, detail_name, detail_quantity, detail_price, detail_url, detail_path, detail_create) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())', [orderId, id, itemName, quantity, price, link, detailPath]);
+                    }
+
+                    return id; // Return the detail_id
+                })
+            );
+
+            res.status(200).json({ message: 'Order updated successfully!', orderId, detailIds: insertOrderDetailsQuery });
+        } else {
+            // If the order does not exist, create a new order
+            const orderNum = generateOrderNumber();
+            const insertOrderQuery = await queryPromise('INSERT INTO orders (order_num, user_id, order_status, order_state, order_create) VALUES (?, ?, ?, ?, NOW())', [orderNum, userId, 'Inactive', 'pending']);
+            const newOrderId = insertOrderQuery.insertId;
+
+            const insertOrderDetailsQuery = await Promise.all(
+                orders.map(async (order, index) => {
+                    const { id, itemName, quantity, price, link } = order;
+                    const detailPath = req.files[index] ? `/uploads/images_order/${req.files[index].filename}` : null;
+                    const insertDetailQuery = await queryPromise('INSERT INTO order_detail (order_id, detail_id, detail_name, detail_quantity, detail_price, detail_url, detail_path, detail_create) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())', [newOrderId, id, itemName, quantity, price, link, detailPath]);
+                    return insertDetailQuery.insertId; // Return the detail_id
+                })
+            );
+
+            res.status(200).json({ message: 'Order created successfully!', orderId: newOrderId, detailIds: insertOrderDetailsQuery });
+        }
     } catch (error) {
-        console.error('Error updating details:', error);
+        console.error('Error creating or updating order and details:', error);
         res.status(500).json({ error: 'Internal server error.' });
     }
 });

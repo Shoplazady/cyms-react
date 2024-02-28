@@ -55,7 +55,7 @@ const DeleteorderModal = ({ open, onClose, onConfirm, orderNo, orderId }) => {
                         <IoClose className='w-6 h-6' />
                     </Button>
                 </div>
-                <DialogHeader></DialogHeader>
+                <DialogHeader>Delete order</DialogHeader>
                 <DialogBody className='text-gray-100 dark:text-gray-900'>
                     Are you sure you want to delete {orderNo || 'this'} and Order ID {orderId}?
                 </DialogBody>

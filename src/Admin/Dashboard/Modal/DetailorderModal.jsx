@@ -36,7 +36,7 @@ const DetailorderModal = ({ open, onClose, detailId }) => {
             <div className="max-w-full bg-gray-700 dark:bg-gray-100 p-1 rounded-md overflow-y-auto max-h-screen">
                 <DialogHeader>Edit Order {detailId} </DialogHeader>
                 <DialogBody>
-                    <div class="relative overflow-x-auto">
+                    <div className="relative overflow-x-auto">
                         <table className="w-full text-sm text-left rtl:text-right text-gray-300 dark:text-gray-800">
                             <thead className="text-xs text-gray-50 uppercase bg-gray-900 dark:bg-gray-200 dark:text-gray-900">
                                 <tr>

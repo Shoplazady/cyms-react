@@ -3,7 +3,6 @@ import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@materia
 import Select from 'react-select';
 import { FaPlus, FaMinus, FaLink } from 'react-icons/fa';
 import { RiDeleteBin6Fill } from 'react-icons/ri';
-import { MdAttachFile } from 'react-icons/md';
 import { useAlert } from './../../components/AlertContext';
 
 const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
@@ -80,6 +79,50 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
         }
     }, [orderDetails]);
 
+    const handleConfirm = async () => {
+        try {
+            if (!selectedUser) {
+                showAlert('error', 'Please select a user.');
+                return;
+            }
+
+            if (orders.length === 0) {
+                showAlert('error', 'Please add at least one order.');
+                return;
+            }
+
+            const userId = selectedUser.value;
+
+            const formData = new FormData();
+            formData.append('userId', userId);
+            formData.append('orderId', orderId);
+
+
+            formData.append('orders', JSON.stringify(orders));
+
+
+            orders.forEach((order, index) => {
+                if (order.picture) {
+                    formData.append('picture', order.picture || null);
+                }
+            });
+
+            const editOrderResponse = await fetch(`http://localhost:3001/api/admin/editdetailimages`, {
+                method: 'PUT',
+                body: formData,
+            });
+
+            if (editOrderResponse.ok) {
+                showAlert('success', 'Order updated successfully!');
+                onClose();
+            } else {
+                showAlert('error', `Failed to update order: ${editOrderResponse.statusText}`);
+            }
+        } catch (error) {
+            showAlert('error', `Error updating order: ${error.message}`);
+        }
+    };
+
     const handleIncrement = (id) => {
         setOrders((prevOrders) =>
             prevOrders.map((order) => (order.id === id ? { ...order, quantity: order.quantity + 1 } : order))
@@ -119,51 +162,6 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
         };
     }, [open]);
 
-    const handleUpdateDetails = async () => {
-        try {
-            if (!selectedUser) {
-                showAlert('error', 'Please select a user.');
-                return;
-            }
-
-            if (orders.length === 0) {
-                showAlert('error', 'Please add at least one order.');
-                return;
-            }
-
-            const userId = selectedUser.value;
-
-            const formData = new FormData();
-            formData.append('userId', userId);
-            formData.append('orderId', orderId);
-
-           
-            formData.append('orders', JSON.stringify(orders));
-
-            
-            orders.forEach((order, index) => {
-                if (order.picture) {
-                    formData.append('picture', order.picture || null);
-                }
-            });
-
-            console.log('FormData:', formData);
-            const editOrderResponse = await fetch(`http://localhost:3001/api/admin/editdetailimages`, {
-                method: 'PUT',
-                body: formData,
-            });
-
-            if (editOrderResponse.ok) {
-                showAlert('success', 'Order updated successfully!');
-                onClose();
-            } else {
-                showAlert('error', `Failed to update order: ${editOrderResponse.statusText}`);
-            }
-        } catch (error) {
-            showAlert('error', `Error updating order: ${error.message}`);
-        }
-    };
-
     return (
         <Dialog open={open} onClose={onClose} className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-opacity-5 text-gray-100 dark:text-gray-900">
             <div className="lg:w-1/2 md:w-full bg-gray-700 dark:bg-gray-100 p-8 rounded-md overflow-y-auto max-h-screen">
@@ -186,7 +184,7 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
                             <label htmlFor="orderAdd" className="block mb-2 text-sm font-medium text-white dark:text-gray-900">
                                 Order Add
                             </label>
-                            {orders.map((order,index) => (
+                            {orders.map((order, index) => (
                                 <div className="mb-6 space-y-4" key={order.id}>
                                     <div className="flex items-center">
                                         <input
@@ -223,19 +221,19 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
                                                 }
                                             />
                                         )}
+                                    </div>
+                                    <div className="relative flex items-center space-x-1 max-w-[8rem]">
                                         <label
                                             htmlFor={`file-${order.id}`}
                                             className="ml-2 p-2 text-blue-500 hover:text-blue-700 cursor-pointer"
                                         >
-                                            <MdAttachFile className="w-6 h-6" />
                                             <input
                                                 type="file"
                                                 id={`file-${order.id}`}
-                                                className="hidden"
+                                                className="w-auto"
                                                 onChange={(e) => {
                                                     const selectedFile = e.target.files[0];
-                                                    console.log('Selected File:', selectedFile);
-                                                
+
                                                     setOrders((prevOrders) =>
                                                         prevOrders.map((o) =>
                                                             o.id === order.id ? { ...o, picture: selectedFile } : o
@@ -244,8 +242,6 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
                                                 }}
                                             />
                                         </label>
-                                    </div>
-                                    <div className="relative flex items-center space-x-1 max-w-[8rem]">
                                         <input
                                             type="text"
                                             id={`price-${order.id}`}
@@ -259,13 +255,13 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
                                             }
                                             required
                                         />
-                                        <button
+                                        <Button
                                             type="button"
                                             onClick={() => handleDecrement(order.id)}
                                             className="bg-gray-700 dark:bg-gray-100 dark:hover:bg-gray-200 dark:border-gray-300 hover:bg-gray-600 border border-gray-600 rounded-s-lg p-3 h-11 focus:ring-gray-700 dark:focus:ring-gray-100 focus:ring-2 focus:outline-none"
                                         >
                                             <FaMinus className="w-3 h-3 text-gray-50 dark:text-gray-900" />
-                                        </button>
+                                        </Button>
                                         <input
                                             type="text"
                                             id={`quantity-${order.id}`}
@@ -274,20 +270,20 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
                                             value={order.quantity}
                                             readOnly
                                         />
-                                        <button
+                                        <Button
                                             type="button"
                                             onClick={() => handleIncrement(order.id)}
                                             className="bg-gray-700 dark:bg-gray-100 dark:hover:bg-gray-200 dark:border-gray-300 hover:bg-gray-600 border border-gray-600 rounded-e-lg p-3 h-11 focus:ring-gray-700 dark:focus:ring-gray-100 focus:ring-2 focus:outline-none"
                                         >
                                             <FaPlus className="w-3 h-3 text-gray-50 dark:text-gray-900" />
-                                        </button>
-                                        <button
+                                        </Button>
+                                        <Button
                                             type="button"
                                             onClick={() => handleDeleteOrder(order.id)}
                                             className="ml-2 p-2 text-red-500 hover:text-red-700"
                                         >
                                             <RiDeleteBin6Fill className="w-4 h-4" />
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             ))}
@@ -299,11 +295,11 @@ const EditOrderModal = ({ open, onClose, orderId, orderUid }) => {
                 </DialogBody>
                 <DialogFooter className="flex justify-between items-center">
                     <div className="text-white dark:text-gray-900">Total Price: {calculateTotal().toFixed(2)}</div>
-                    <div>
-                        <Button onClick={onClose} color="red" ripple="light" className="mr-1">
+                    <div className='space-x-1'>
+                        <Button onClick={onClose} className="bg-red-500">
                             Cancel
                         </Button>
-                        <Button onClick={handleUpdateDetails} color="green" ripple="light">
+                        <Button onClick={handleConfirm} className="bg-green-500">
                             Confirm
                         </Button>
                     </div>

@@ -35,7 +35,7 @@ const ActivejobModal = ({ open, onClose , orderId , orderNo }) => {
                         <IoClose className='w-6 h-6' />
                     </Button>
                 </div>
-                <DialogHeader ></DialogHeader>
+                <DialogHeader >Change status order</DialogHeader>
                 <DialogBody className='text-gray-100 dark:text-gray-900'>
                     Are you sure you want to change status {orderNo} ID: {orderId} ?
                 </DialogBody>

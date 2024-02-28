@@ -129,7 +129,7 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
 
     const renderPageNumbers = () => {
         return Array.from({ length: totalPages }, (_, index) => (
-            <button
+            <Button
                 key={index + 1}
                 className={`flex items-center justify-center px-3 h-8 ${currentPage === index + 1
                     ? 'text-gray-100 bg-stone-800 border border-stone-700'
@@ -138,7 +138,7 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                 onClick={() => handlePageChange(index + 1)}
             >
                 {index + 1}
-            </button>
+            </Button>
         ));
     };
 
@@ -363,21 +363,21 @@ const OrderTable = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                     Page {currentPage} of {totalPages}
                 </span>
                 <div className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
-                    <button
+                    <Button
                         className={`flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-100 bg-stone-800 border border-stone-700 rounded-s-lg hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black`}
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
                     >
                         Previous
-                    </button>
+                    </Button>
                     {totalPages > 0 && renderPageNumbers()}
-                    <button
+                    <Button
                         className={`flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-100 bg-stone-800 border border-stone-700 rounded-e-lg hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black`}
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
                     >
                         Next
-                    </button>
+                    </Button>
                 </div>
             </nav>
         </div>
