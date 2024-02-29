@@ -129,7 +129,7 @@ app.get('/api/admin/users', async (req, res) => {
         const offset = (page - 1) * usersPerPage;
 
         // Query to get paginated and filtered users
-        const usersQuery = await queryPromise('SELECT id, first_name, last_name, email, position, agency, tel_num FROM users WHERE first_name LIKE ? OR last_name LIKE ? OR email LIKE ? LIMIT ? OFFSET ?', [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`, usersPerPage, offset]);
+        const usersQuery = await queryPromise('SELECT * FROM users WHERE first_name LIKE ? OR last_name LIKE ? OR email LIKE ? LIMIT ? OFFSET ?', [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`, usersPerPage, offset]);
 
         // Query to get total number of filtered users
         const totalUsersQuery = await queryPromise('SELECT COUNT(*) as total FROM users WHERE first_name LIKE ? OR last_name LIKE ? OR email LIKE ?', [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`]);
@@ -243,27 +243,60 @@ app.post('/api/admin/adduser', upload.single('profilePic'), async (req, res) => 
     }
 });
 
+app.put('/api/admin/user/updateStatus/:userId', async (req, res) => {
+    try {
+        const userId = req.params.userId;
+
+        // Fetch the current job status from the database
+        const currentStatusQuery = await queryPromise('SELECT user_status FROM users WHERE id = ?', [userId]);
+
+        if (!currentStatusQuery || currentStatusQuery.length === 0) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        const currentStatus = currentStatusQuery[0].user_status;    
+
+        // Toggle the status
+        const updatedStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+
+        // Update the job status in the database
+        const updateQuery = 'UPDATE users SET user_status = ? WHERE id = ?';
+        await queryPromise(updateQuery, [updatedStatus, userId]);
+
+        res.status(200).json({ success: true, message: 'User status updated successfully.', updatedStatus });
+    } catch (error) {
+        console.error('Error updating user status:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
 app.delete('/api/admin/deleteuser/:userId', async (req, res) => {
     const userId = req.params.userId;
     console.log('Received request to delete user with ID:', userId);
 
     try {
-        // Check if the user with the specified userId exists
-        const userResult = await queryPromise('SELECT * FROM users WHERE id = ?', [userId]);
+        // Check for orders associated with the user
+        const ordersResult = await queryPromise('SELECT * FROM orders WHERE user_id = ?', [userId]);
 
-        if (!userResult || userResult.length === 0) {
-            return res.status(404).json({ error: 'User not found.' });
+        // Delete order details associated with the user's orders
+        if (ordersResult && ordersResult.length > 0) {
+            const orderIds = ordersResult.map((order) => order.order_id);
+            await queryPromise('DELETE FROM order_detail WHERE order_id IN (?)', [orderIds]);
         }
+
+        // Delete orders associated with the user
+        await queryPromise('DELETE FROM orders WHERE user_id = ?', [userId]);
 
         // Delete the user
         await queryPromise('DELETE FROM users WHERE id = ?', [userId]);
 
-        res.status(200).json({ success: true, message: 'User deleted successfully.' });
+        res.status(200).json({ success: true, message: 'User and associated data deleted successfully.' });
     } catch (error) {
-        console.error('Error deleting user:', error);
+        console.error('Error deleting user and associated data:', error);
         res.status(500).json({ error: 'Internal server error.' });
     }
 });
+
 
 app.get('/api/admin/job', async (req, res) => {
     try {

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { RiDeleteBin6Fill } from "react-icons/ri";
+import { FiEdit } from "react-icons/fi";
 import { Avatar, Button } from '@material-tailwind/react';
 import CreateuserModal from './../Modal/CreateuserModal';
 import EdituserModal from './../Modal/EdituserModal';
 import DeleteModal from '../Modal/DeleteModal';
+import ActiveuserModal from '../Modal/ActiveuserModal';
 
 const SortableTable = ({ usersPerPage, onPageChange, onSearchChange }) => {
 
@@ -20,6 +22,7 @@ const SortableTable = ({ usersPerPage, onPageChange, onSearchChange }) => {
     const [createUserModalOpen, setCreateUserModalOpen] = useState(false);
     const [editUserModalOpen, setEditUserModalOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [activeuserModalOpen, setActiveUserModalOpen] = useState(false);
 
     const openCreateUserModal = () => setCreateUserModalOpen(true);
     const closeCreateUserModal = () => setCreateUserModalOpen(false);
@@ -32,6 +35,16 @@ const SortableTable = ({ usersPerPage, onPageChange, onSearchChange }) => {
     const closeEditUserModal = () => {
         setSelectedUser(null);
         setEditUserModalOpen(false);
+    };
+
+    const openActiveUserModal = (user) => {
+        setSelectedUser(user);
+        setActiveUserModalOpen(true);
+    };
+
+    const closeActiveUserModal = () => {
+        setSelectedUser(null);
+        setActiveUserModalOpen(false);
     };
 
     const openDeleteModal = (user) => {
@@ -83,48 +96,20 @@ const SortableTable = ({ usersPerPage, onPageChange, onSearchChange }) => {
 
     const handleRowSelect = (rowId) => {
         const updatedSelectedRows = [...selectedRows];
-    
+
         if (updatedSelectedRows.includes(rowId)) {
-            
+
             const index = updatedSelectedRows.indexOf(rowId);
             updatedSelectedRows.splice(index, 1);
         } else {
-            
+
             updatedSelectedRows.push(rowId);
         }
-    
+
         setSelectedRows(updatedSelectedRows);
-        
+
         const selectedUser = users.find((user) => user.id === rowId);
         setSelectedUser(selectedUser);
-    };
-
-    const handleDelete = async () => {
-        try {
-            if (!selectedUser) {
-                console.error('No user selected for deletion');
-                return;
-            }
-
-            // Show a confirmation modal here if needed
-
-            const response = await fetch(`http://localhost:3001/api/admin/deleteuser/${selectedUser.id}`, {
-                method: 'DELETE',
-            });
-
-            if (response.ok) {
-               
-                setUsers((prevUsers) => prevUsers.filter((user) => user.id !== selectedUser.id));
-                console.log('User deleted successfully.');
-                closeDeleteModal();
-            } else {
-                console.error('Error deleting user:', response.statusText);
-                
-            }
-        } catch (error) {
-            console.error('Error deleting user:', error);
-            
-        }
     };
 
     const renderPageNumbers = () => {
@@ -203,6 +188,9 @@ const SortableTable = ({ usersPerPage, onPageChange, onSearchChange }) => {
                                 Position
                             </th>
                             <th scope="col" className="px-6 py-3">
+                                Agency
+                            </th>
+                            <th scope="col" className="px-6 py-3">
                                 Status
                             </th>
                             <th scope="col" className="px-6 py-3">
@@ -236,7 +224,7 @@ const SortableTable = ({ usersPerPage, onPageChange, onSearchChange }) => {
                                             alt={`${user.first_name} ${user.last_name}`}
                                             className="w-10 h-10 rounded-full"
                                             style={{ width: '40px', height: '40px' }}
-                                            src={require('./../../../Components/images/avatar.png')}
+                                            src={user.picture_path ? user.picture_path : require('./../../../Components/images/avatar.png')}
                                         />
                                         <div className="ps-3">
                                             <div className="text-base font-semibold">
@@ -246,34 +234,47 @@ const SortableTable = ({ usersPerPage, onPageChange, onSearchChange }) => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-gray-100 whitespace-nowrap dark:text-gray-900">{user.position}</td>
+                                    <td className="px-6 py-4 text-gray-100 whitespace-nowrap dark:text-gray-900">{user.agency}</td>
                                     <td className="px-6 py-4 text-gray-100 whitespace-nowrap dark:text-gray-900">
-                                        <div className="flex items-center">
-                                            <div className="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Online
+                                        <div className="flex items-center space-x-2">
+                                            {user.user_status === 'Active' ? (
+                                                <span className="relative flex h-3 w-3 me-1">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                                </span>
+                                            ) : (
+                                                <div className="h-2.5 w-2.5 rounded-full bg-red-500 me-1"></div>
+                                            )}
+                                            {user.user_status}
+                                            <FiEdit
+                                                className='hover:text-blue-500'
+                                                onClick={() => openActiveUserModal(user)}
+                                            />
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                <div className='flex items-center'>
-                                    <Button
-                                        className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
-                                        onClick={() => openEditUserModal(user)}
-                                    >
-                                        <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
-                                            Edit
-                                        </span>
-                                    </Button>
-                                    <Button
-                                        className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
-                                        onClick={() => openDeleteModal(user)}
-                                    >
-                                        <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
-                                            <RiDeleteBin6Fill className='w-5 h-5' />
-                                        </span>
-                                    </Button>
-                                </div>
-                                
-                                <DeleteModal open={deleteModalOpen} onClose={closeDeleteModal} onConfirm={handleDelete} orderId={selectedUser?.id} userName={selectedUser ? `${selectedUser.first_name} ${selectedUser.last_name}` : ''} />
-                                <EdituserModal open={editUserModalOpen} onClose={closeEditUserModal} userId={selectedUser?.id} />
-                            </td>
+                                        <div className='flex items-center'>
+                                            <Button
+                                                className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
+                                                onClick={() => openEditUserModal(user)}
+                                            >
+                                                <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
+                                                    Edit
+                                                </span>
+                                            </Button>
+                                            <Button
+                                                className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
+                                                onClick={() => openDeleteModal(user)}
+                                            >
+                                                <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
+                                                    <RiDeleteBin6Fill className='w-5 h-5' />
+                                                </span>
+                                            </Button>
+                                        </div>
+                                        <ActiveuserModal open={activeuserModalOpen} onClose={closeActiveUserModal} userId={selectedUser?.id} userName={selectedUser ? `${selectedUser.first_name} ${selectedUser.last_name}` : ''} />
+                                        <DeleteModal open={deleteModalOpen} onClose={closeDeleteModal} userId={selectedUser?.id} userName={selectedUser ? `${selectedUser.first_name} ${selectedUser.last_name}` : ''} />
+                                        <EdituserModal open={editUserModalOpen} onClose={closeEditUserModal} userId={selectedUser?.id} />
+                                    </td>
 
                                 </tr>
                             ))

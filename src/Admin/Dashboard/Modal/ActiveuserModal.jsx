@@ -3,35 +3,27 @@ import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@materia
 import { IoClose } from "react-icons/io5";
 import { useAlert } from './../../components/AlertContext';
 
-const DeleteModal = ({ open, onClose, userName, userId }) => {
+const ActiveuserModal = ({ open, onClose , userId , userName }) => {
+
     const { showAlert } = useAlert();
 
-    const handleConfirm = async ()  => {
-
+    const handleConfirm = async () => {
         try {
-            if (!userId) {
-                console.error('No user selected for deletion');
-                return;
-            }
-
-            // Show a confirmation modal here if needed
-
-            const response = await fetch(`http://localhost:3001/api/admin/deleteuser/${userId}`, {
-                method: 'DELETE',
+            
+            const response = await fetch(`http://localhost:3001/api/admin/user/updateStatus/${userId}`, {
+                method: 'PUT',
             });
 
             if (response.ok) {
-
-                showAlert('success', `Delete ${userName} successfully!`);
+                showAlert('success', 'User status updated successfully!');
                 onClose();
-
             } else {
-                console.error('Error deleting user:', response.statusText);
-
+                const data = await response.json();
+                showAlert('error', data.error || 'Failed to update user status.');
             }
         } catch (error) {
-            console.error('Error deleting user:', error);
-
+            console.error('Error updating user status:', error);
+            showAlert('error', 'Internal server error.');
         }
     };
 
@@ -43,9 +35,9 @@ const DeleteModal = ({ open, onClose, userName, userId }) => {
                         <IoClose className='w-6 h-6' />
                     </Button>
                 </div>
-                <DialogHeader>Delete User</DialogHeader>
+                <DialogHeader >Change status order</DialogHeader>
                 <DialogBody className='text-gray-100 dark:text-gray-900'>
-                    Are you sure you want to delete {userName || 'this'} and User ID {userId}?
+                    Are you sure you want to change status {userName} ID: {userId} ?
                 </DialogBody>
                 <DialogFooter>
                     <Button onClick={handleConfirm} className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center me-2">
@@ -60,4 +52,4 @@ const DeleteModal = ({ open, onClose, userName, userId }) => {
     );
 }
 
-export default DeleteModal;
+export default ActiveuserModal;
