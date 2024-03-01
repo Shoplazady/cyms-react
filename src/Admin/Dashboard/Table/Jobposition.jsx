@@ -77,7 +77,7 @@ const JobTable = () => {
     return (
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg" >
 
-            <nav className="flex p-3" aria-label="Breadcrumb">
+            <nav className="flex p-3">
                 <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
                     <li className="inline-flex items-center">
                         <Link to="/admin/" className="inline-flex items-center text-sm font-medium text-gray-50 hover:text-blue-600 dark:text-gray-900 dark:hover:text-blue-600">
@@ -223,7 +223,7 @@ const JobTable = () => {
                     </tbody>
                 </table>
             </div>
-            <nav className="flex items-center flex-column flex-wrap md:flex-row justify-between p-4 bg-gray-600 dark:bg-gray-50" aria-label="Table navigation">
+            <nav className="flex items-center flex-column flex-wrap md:flex-row justify-between p-4 bg-gray-600 dark:bg-gray-50">
                 <span className="text-sm font-medium text-gray-100 dark:text-gray-900 mb-4 md:mb-0 block w-full md:inline md:w-auto">
                     Showing job total <span className='text-gray-300 dark:text-gray-500'>{totalJobs}</span>
                 </span>

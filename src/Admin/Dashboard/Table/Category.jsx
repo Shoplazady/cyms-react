@@ -76,7 +76,7 @@ const CategoryTable = () => {
     return (
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg" >
 
-            <nav className="flex p-3" aria-label="Breadcrumb">
+            <nav className="flex p-3">
                 <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
                     <li class="inline-flex items-center">
                         <Link to="/admin/" class="inline-flex items-center text-sm font-medium text-gray-50 hover:text-blue-600 dark:text-gray-900 dark:hover:text-blue-600">
@@ -222,7 +222,7 @@ const CategoryTable = () => {
                     </tbody>
                 </table>
             </div>
-            <nav className="flex items-center flex-column flex-wrap md:flex-row justify-between p-4 bg-gray-600 dark:bg-gray-50" aria-label="Table navigation">
+            <nav className="flex items-center flex-column flex-wrap md:flex-row justify-between p-4 bg-gray-600 dark:bg-gray-50">
                 <span className="text-sm font-medium text-gray-100 dark:text-gray-900 mb-4 md:mb-0 block w-full md:inline md:w-auto">
                     Showing <span className='text-gray-300 dark:text-gray-500'>1-10</span> of <span className='text-gray-300 dark:text-gray-500'>1000</span>
                 </span>
@@ -243,7 +243,7 @@ const CategoryTable = () => {
                         <a href="#" className="flex items-center justify-center px-3 h-8 leading-tight text-gray-100 bg-gray-700 border border-gray-900 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">2</a>
                     </li>
                     <li>
-                        <a href="#" aria-current="page" className="flex items-center justify-center px-3 h-8 text-gray-100 bg-gray-700 border border-gray-900 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">3</a>
+                        <a href="#" className="flex items-center justify-center px-3 h-8 text-gray-100 bg-gray-700 border border-gray-900 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">3</a>
                     </li>
                     <li>
                         <a href="#" className="flex items-center justify-center px-3 h-8 leading-tight text-gray-100 bg-gray-700 border border-gray-900 hover:bg-stone-900 dark:bg-gray-100 dark:border-gray-300 dark:text-gray-900 dark:hover:bg-gray-200 dark:hover:text-black">4</a>

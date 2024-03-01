@@ -77,7 +77,6 @@ const Navbar = () => {
                     key={item.name}
                     to={item.href}
                     className={`flex items-center rounded-md px-3 py-2 text-sm font-medium dark:text-black ${item.current ? 'bg-gray-900 text-white' : 'text-gray-100 hover:bg-gray-700 hover:text-white'}`}
-                    aria-current={item.current ? 'page' : undefined}
                 >
                     {item.icon && React.cloneElement(item.icon, { className: 'h-5 w-5 mr-2' })}
                     <span>{item.name}</span>
@@ -118,7 +117,6 @@ const Navbar = () => {
                                     key={item.name}
                                     to={item.href}
                                     className={`flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-50 dark:text-black hover:bg-stone-700 dark:hover:bg-gray-300`}
-                                    aria-current={item.current ? 'page' : undefined}
                                 >
                                     {item.icon && React.cloneElement(item.icon, { className: 'h-5 w-5 mr-2' })}
                                     <span>{item.name}</span>

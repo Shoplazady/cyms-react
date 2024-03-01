@@ -16,7 +16,7 @@ const UserManage = () => {
 
     return (
         <>
-            <nav className="flex p-3" aria-label="Breadcrumb">
+            <nav className="flex p-3">
                 <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
                     <li className="inline-flex items-center">
                         <Link to="/admin/" className="inline-flex items-center text-sm font-medium text-gray-50 hover:text-blue-600 dark:text-gray-900 dark:hover:text-blue-600">

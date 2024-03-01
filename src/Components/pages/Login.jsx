@@ -29,17 +29,14 @@ const Login = () => {
         throw new Error(`Login failed with status ${response.status}: ${errorMessage}`);
       }
 
-      const userData = await response.json();
-
+      const { userData, token } = await response.json();
 
       if (rememberMe) {
+        const { first_name, last_name, level, email, id } = userData;
 
-        const { first_name, last_name, level, email } = userData;
-
-
-        localStorage.setItem('rememberedUser', JSON.stringify({ first_name, last_name, level, email }));
+        localStorage.setItem('user', JSON.stringify({ first_name, last_name, level, email, id }));
+        localStorage.setItem('token', token);
       }
-
 
       login(userData);
 
@@ -110,7 +107,9 @@ const Login = () => {
                   <label htmlFor="remember" className="text-gray-200 dark:text-gray-800">Remember me</label>
                 </div>
               </div>
-              <a href="#" className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">Forgot password?</a>
+              <div>
+                <Link to="/" className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">Forgot password?</Link>
+              </div>
             </div>
             <button
               type="button" // Prevent the form submission for now

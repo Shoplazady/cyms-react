@@ -1,4 +1,5 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -10,6 +11,7 @@ const path = require('path');
 const app = express();
 
 app.use(cors());
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
@@ -110,8 +112,14 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ error: 'Invalid email or password.' });
         }
 
-        // Respond with the user data
-        res.status(200).json(userData);
+        // Generate a JWT token
+        const token = jwt.sign({ email: userData.email, userId: userData.id }, 'yourSecretKey', { expiresIn: '7d' });
+
+        // Set the token as an HTTP-only cookie
+        res.cookie('yourTokenCookieName', token, { httpOnly: true });
+
+        // Respond with the user data and token
+        res.status(200).json({ userData, token });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Internal server error.' });
@@ -254,7 +262,7 @@ app.put('/api/admin/user/updateStatus/:userId', async (req, res) => {
             return res.status(404).json({ error: 'User not found.' });
         }
 
-        const currentStatus = currentStatusQuery[0].user_status;    
+        const currentStatus = currentStatusQuery[0].user_status;
 
         // Toggle the status
         const updatedStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
@@ -692,6 +700,72 @@ app.put('/api/admin/editdetailimages', upload.array('picture'), async (req, res)
         res.status(500).json({ error: 'Internal server error.' });
     }
 });
+
+
+
+app.get('/api/user/orders/:userId', async (req, res) => {
+    try {
+        
+        const userId = req.params.userId;
+
+        const page = parseInt(req.query.page) || 1;
+        const ordersPerPage = parseInt(req.query.ordersPerPage) || 10;
+        const searchTerm = req.query.searchTerm || '';
+
+        // Calculate offset
+        const offset = (page - 1) * ordersPerPage;
+
+        // Query to get paginated and filtered orders with user details and total price for each order
+        const ordersQuery = await queryPromise(`
+            SELECT
+                orders.order_id,
+                orders.user_id AS order_uid,
+                orders.order_num,
+                users.first_name,
+                users.last_name,
+                DATE_FORMAT(orders.order_create, '%Y-%m-%d %H:%i:%s') AS order_create,
+                orders.order_state,
+                orders.order_status,
+                SUM(order_detail.detail_price * order_detail.detail_quantity) as total_price
+            FROM
+                orders
+                JOIN users ON orders.user_id = users.id
+                JOIN order_detail ON orders.order_id = order_detail.order_id
+            WHERE
+                users.id = ? AND (users.first_name LIKE ? OR users.last_name LIKE ? OR orders.order_num LIKE ?)
+            GROUP BY
+                orders.order_id
+            ORDER BY orders.order_create DESC
+            LIMIT ? OFFSET ?`,
+            [userId, `%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`, ordersPerPage, offset]
+        );
+
+        // Query to get total number of filtered orders
+        const totalOrdersQuery = await queryPromise(`
+            SELECT COUNT(DISTINCT orders.order_id) as total
+            FROM orders
+            JOIN users ON orders.user_id = users.id
+            JOIN order_detail ON orders.order_id = order_detail.order_id
+            WHERE users.id = ? AND (users.first_name LIKE ? OR users.last_name LIKE ? OR orders.order_num LIKE ?)`,
+            [userId, `%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`]
+        );
+        const totalOrders = totalOrdersQuery[0].total;
+
+        // Calculate total pages
+        const totalPages = Math.ceil(totalOrders / ordersPerPage);
+
+        // Send response with filtered order data, total orders, and total pages
+        res.status(200).json({
+            orders: ordersQuery,
+            totalOrders,
+            totalPages,
+        });
+    } catch (error) {
+        console.error('Error retrieving order data:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
 
 const PORT = 3001;
 
