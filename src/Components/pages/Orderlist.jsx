@@ -330,13 +330,19 @@ const Orderlist = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
                                                     <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
                                                 </span>
+                                            ) : order.order_state === 'approve' ? (
+                                                <span className="relative flex h-3 w-3 me-1">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                                </span>
                                             ) : (
                                                 <div className="h-2.5 w-2.5 rounded-full bg-red-500 me-1"></div>
                                             )}
                                             {order.order_state}
                                             <FiEdit
                                                 className='hover:text-blue-500'
-                                                onClick={() => openCommentOrderModal(order)} />
+                                                onClick={() => openCommentOrderModal(order)}
+                                            />
                                         </div>
                                         <CommentorderModal open={commentOrderOpen} onClose={closeCommentOrderModal} orderId={selectedOrder?.order_id} orderNo={selectedOrder?.order_num} />
                                     </td>

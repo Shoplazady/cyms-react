@@ -979,29 +979,48 @@ app.get('/api/inspector/orders', async (req, res) => {
 app.put('/api/inspector/order/updateState/:orderId', async (req, res) => {
     try {
         const orderId = req.params.orderId;
+        const { userId, orderState, comment } = req.body;
 
-        // Fetch the current job status from the database
-        const currentStatusQuery = await queryPromise('SELECT order_status FROM orders WHERE order_id = ?', [orderId]);
+        console.log(req.body);
 
-        if (!currentStatusQuery || currentStatusQuery.length === 0) {
-            return res.status(404).json({ error: 'order not found.' });
+        // Fetch the current order state from the orders table
+        const currentOrderQuery = await queryPromise('SELECT order_state FROM orders WHERE order_id = ?', [orderId]);
+
+        // Fetch existing comment for the order
+        const currentCommentQuery = await queryPromise('SELECT comment_id FROM order_comments WHERE order_id = ?', [orderId]);
+
+        // Check if the order exists
+        if (!currentOrderQuery || currentOrderQuery.length === 0) {
+            return res.status(404).json({ error: 'Order not found.' });
         }
 
-        const currentStatus = currentStatusQuery[0].order_status;
+        // Update the order state in the database
+        const updateOrderQuery = 'UPDATE orders SET order_state = ? WHERE order_id = ?';
+        await queryPromise(updateOrderQuery, [orderState, orderId]);
 
-        // Toggle the status
-        const updatedStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+        // If the order state is 'not approve' and a comment is provided
+        if (orderState === 'not_approved' && comment) {
+            // Check if there is an existing comment for the order
+            if (currentCommentQuery && currentCommentQuery.length > 0) {
+                // Update the existing comment
+                const updateCommentQuery = 'UPDATE order_comments SET comment_text = ? WHERE order_id = ?';
+                await queryPromise(updateCommentQuery, [comment, orderId]);
+            } else {
+                // Insert a new comment
+                const insertCommentQuery = 'INSERT INTO order_comments (order_id, user_id, comment_text, comment_date) VALUES (?, ?, ?, NOW())';
+                await queryPromise(insertCommentQuery, [orderId, userId, comment]);
+            }
+        }
 
-        // Update the job status in the database
-        const updateQuery = 'UPDATE orders SET order_status = ? WHERE order_id = ?';
-        await queryPromise(updateQuery, [updatedStatus, orderId]);
-
-        res.status(200).json({ success: true, message: 'Order status updated successfully.', updatedStatus });
+        // Respond with success message
+        res.status(200).json({ success: true, message: 'Order state and comment updated successfully.' });
     } catch (error) {
-        console.error('Error updating order status:', error);
+        console.error('Error updating order state and comment:', error);
         res.status(500).json({ error: 'Internal server error.' });
     }
 });
+
+
 
 const PORT = 3001;
 
