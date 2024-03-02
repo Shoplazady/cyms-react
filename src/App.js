@@ -4,6 +4,7 @@ import { DarkModeProvider } from './hooks/useDarkMode';
 import MainContent from './Components/MainContent';
 import Login from './Components/pages/Login';
 import Createorder from './Components/pages/Createorder';
+import Orderlist from './Components/pages/Orderlist';
 import Register from './Components/pages/Register';
 import Layout from './Components/Layout';
 import AuthGuard from './Components/AuthGuard';
@@ -29,6 +30,7 @@ function App() {
                     <Route path="/register" element={<Register />} />
                     <Route path="/" element={<MainContent />} />
                     <Route path="/create" element={<Createorder />} />
+                    <Route path="/list" element={<Orderlist />} />
                   </Routes>
                 </Layout>
               }

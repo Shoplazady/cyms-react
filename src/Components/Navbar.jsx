@@ -5,7 +5,7 @@ import { IoMdMoon, IoMdSunny, IoMdHelp } from "react-icons/io";
 import { FaUserEdit } from "react-icons/fa";
 import { IoNotifications } from "react-icons/io5";
 import { FiAlignJustify, FiArrowUp, FiLogOut } from "react-icons/fi";
-import { FaHome, FaPlus, FaList, FaClipboard } from 'react-icons/fa';
+import { FaHome, FaPlus, FaClipboard } from 'react-icons/fa';
 import {
     Navbar as MaterialNavbar,
     Collapse, 
@@ -58,8 +58,7 @@ const Navbar = () => {
     const navigation = [
         { name: 'Home', href: '/', icon: <FaHome />, current: false },
         { name: 'Create', href: '/create', icon: <FaPlus />, current: false },
-        { name: 'Order List', href: '#', icon: <FaList />, current: false },
-        { name: 'Order Status', href: '#', icon: <FaClipboard />, current: false },
+        { name: 'Order List', href: '/list', icon: <FaClipboard />, current: false },
     ];
 
     React.useEffect(() => {

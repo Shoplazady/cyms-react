@@ -915,8 +915,93 @@ app.put('/api/user/editdetailimages/:userId', upload.array('picture'), async (re
 });
 
 //Api Inspector
+app.get('/api/inspector/orders', async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const ordersPerPage = parseInt(req.query.ordersPerPage) || 10;
+        const searchTerm = req.query.searchTerm || '';
 
 
+        // Calculate offset
+        const offset = (page - 1) * ordersPerPage;
+
+        // Query to get paginated and filtered orders with user details and total price for each order
+        const ordersQuery = await queryPromise(`
+            SELECT
+                orders.order_id,
+                orders.user_id AS order_uid,
+                orders.order_num,
+                users.first_name,
+                users.last_name,
+                DATE_FORMAT(orders.order_create, '%Y-%m-%d %H:%i:%s') AS order_create,
+                orders.order_state,
+                orders.order_status,
+                SUM(order_detail.detail_price * order_detail.detail_quantity) as total_price
+            FROM
+                orders
+                JOIN users ON orders.user_id = users.id
+                JOIN order_detail ON orders.order_id = order_detail.order_id
+            WHERE
+                users.first_name LIKE ? OR users.last_name LIKE ? OR orders.order_num LIKE ?
+            GROUP BY
+                orders.order_id
+            ORDER BY orders.order_create DESC
+            LIMIT ? OFFSET ?`,
+            [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`, ordersPerPage, offset]
+        );
+
+        // Query to get total number of filtered orders
+        const totalOrdersQuery = await queryPromise(`
+            SELECT COUNT(DISTINCT orders.order_id) as total
+            FROM orders
+            JOIN users ON orders.user_id = users.id
+            JOIN order_detail ON orders.order_id = order_detail.order_id
+            WHERE users.first_name LIKE ? OR users.last_name LIKE ? OR orders.order_num LIKE ?`,
+            [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`]
+        );
+        const totalOrders = totalOrdersQuery[0].total;
+
+        // Calculate total pages
+        const totalPages = Math.ceil(totalOrders / ordersPerPage);
+
+        // Send response with filtered order data, total orders, and total pages
+        res.status(200).json({
+            orders: ordersQuery,
+            totalOrders,
+            totalPages,
+        });
+    } catch (error) {
+        console.error('Error retrieving order data:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+app.put('/api/inspector/order/updateState/:orderId', async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+
+        // Fetch the current job status from the database
+        const currentStatusQuery = await queryPromise('SELECT order_status FROM orders WHERE order_id = ?', [orderId]);
+
+        if (!currentStatusQuery || currentStatusQuery.length === 0) {
+            return res.status(404).json({ error: 'order not found.' });
+        }
+
+        const currentStatus = currentStatusQuery[0].order_status;
+
+        // Toggle the status
+        const updatedStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+
+        // Update the job status in the database
+        const updateQuery = 'UPDATE orders SET order_status = ? WHERE order_id = ?';
+        await queryPromise(updateQuery, [updatedStatus, orderId]);
+
+        res.status(200).json({ success: true, message: 'Order status updated successfully.', updatedStatus });
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
 
 const PORT = 3001;
 

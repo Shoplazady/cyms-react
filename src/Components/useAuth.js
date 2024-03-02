@@ -21,8 +21,10 @@ export const AuthProvider = ({ children }) => {
       role = 'user';
     } else if (level === 3) {
       role = 'admin';
+    } else if (level === 2) {
+      role = 'inspector';
     } else {
-      
+
       role = 'guest';
     }
 
