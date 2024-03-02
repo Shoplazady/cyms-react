@@ -305,7 +305,6 @@ app.delete('/api/admin/deleteuser/:userId', async (req, res) => {
     }
 });
 
-
 app.get('/api/admin/job', async (req, res) => {
     try {
 
@@ -701,7 +700,7 @@ app.put('/api/admin/editdetailimages', upload.array('picture'), async (req, res)
     }
 });
 
-
+// Your API for user
 
 app.get('/api/user/orders/:userId', async (req, res) => {
     try {
@@ -765,6 +764,158 @@ app.get('/api/user/orders/:userId', async (req, res) => {
         res.status(500).json({ error: 'Internal server error.' });
     }
 });
+
+app.post('/api/user/createorderanduploadimages/:userId', upload.array('detailPath'), async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const { orders: ordersString } = req.body;
+        const orders = JSON.parse(ordersString);
+
+        // First, create the order
+        const orderNum = generateOrderNumber();
+        const insertOrderQuery = await queryPromise('INSERT INTO orders (order_num, user_id, order_status, order_state, order_create) VALUES (?, ?, ?, ?, NOW())', [orderNum, userId, 'Inactive', 'pending']);
+        const orderId = insertOrderQuery.insertId;
+
+        const insertOrderDetailsQuery = await Promise.all(
+            orders.map(async (order, index) => {
+                const { itemName, quantity, price, link } = order;
+                const detailPath = req.files[index] ? `/uploads/images_order/${req.files[index].filename}` : null;
+                const insertDetailQuery = await queryPromise('INSERT INTO order_detail (order_id, detail_name, detail_quantity, detail_price, detail_url, detail_path, detail_create) VALUES (?, ?, ?, ?, ?, ?, NOW())', [orderId, itemName, quantity, price, link, detailPath]);
+                return insertDetailQuery.insertId; // Return the detail_id
+            })
+        );
+
+        res.status(200).json({ message: 'Order created successfully!', orderId, detailIds: insertOrderDetailsQuery });
+    } catch (error) {
+        console.error('Error creating order and details:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+app.get('/api/user/detail/:detailId', async (req, res) => {
+    try {
+        const detailId = req.params.detailId;
+        const detailQuery = await queryPromise('SELECT * FROM order_detail WHERE order_id = ?', [detailId]);
+
+        res.status(200).json({ details: detailQuery, totaldetails: detailQuery.length });
+    } catch (error) {
+        console.error('Error fetching detail data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.put('/api/user/order/updateStatus/:orderId', async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+
+        // Fetch the current job status from the database
+        const currentStatusQuery = await queryPromise('SELECT order_status FROM orders WHERE order_id = ?', [orderId]);
+
+        if (!currentStatusQuery || currentStatusQuery.length === 0) {
+            return res.status(404).json({ error: 'order not found.' });
+        }
+
+        const currentStatus = currentStatusQuery[0].order_status;
+
+        // Toggle the status
+        const updatedStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+
+        // Update the job status in the database
+        const updateQuery = 'UPDATE orders SET order_status = ? WHERE order_id = ?';
+        await queryPromise(updateQuery, [updatedStatus, orderId]);
+
+        res.status(200).json({ success: true, message: 'Order status updated successfully.', updatedStatus });
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+app.delete('/api/user/deleteorder/:orderId', async (req, res) => {
+    const orderId = req.params.orderId;
+    console.log('Received request to delete order with ID:', orderId);
+
+    try {
+
+        const orderResult = await queryPromise('SELECT * FROM orders WHERE order_id = ?', [orderId]);
+
+        if (!orderResult || orderResult.length === 0) {
+            return res.status(404).json({ error: 'Order not found.' });
+        }
+
+
+        await queryPromise('DELETE FROM order_detail WHERE order_id = ?', [orderId]);
+
+
+        await queryPromise('DELETE FROM orders WHERE order_id = ?', [orderId]);
+
+        res.status(200).json({ success: true, message: 'Order and related details deleted successfully.' });
+    } catch (error) {
+        console.error('Error deleting order and details:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+app.put('/api/user/editdetailimages/:userId', upload.array('picture'), async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const { orderId, orders: ordersString } = req.body;
+        const orders = JSON.parse(ordersString);
+
+        // Check if the order already exists for the given userId and orderId
+        const existingOrder = await queryPromise('SELECT * FROM orders WHERE user_id = ? AND order_id = ?', [userId, orderId]);
+
+        if (existingOrder.length > 0) {
+            // If the order already exists, update the user_id and order_status
+            await queryPromise('UPDATE orders SET user_id = ? WHERE order_id = ?', [userId, orderId]);
+
+            // Update or insert into the order_detail table for each order
+            const insertOrderDetailsQuery = await Promise.all(
+                orders.map(async (order, index) => {
+                    const { id, itemName, quantity, price, link } = order;
+                    const detailPath = req.files[index] ? `/uploads/images_order/${req.files[index].filename}` : null;
+
+                    // Check if the order_detail with this detail_id already exists
+                    const existingOrderDetail = await queryPromise('SELECT * FROM order_detail WHERE detail_id = ?', [id]);
+
+                    if (existingOrderDetail.length > 0) {
+                        // Update the existing order_detail
+                        await queryPromise('UPDATE order_detail SET detail_name = ?, detail_quantity = ?, detail_price = ?, detail_url = ?, detail_path = ? WHERE detail_id = ?', [itemName, quantity, price, link, detailPath, id]);
+                    } else {
+                        // Insert a new order_detail
+                        await queryPromise('INSERT INTO order_detail (order_id, detail_id, detail_name, detail_quantity, detail_price, detail_url, detail_path, detail_create) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())', [orderId, id, itemName, quantity, price, link, detailPath]);
+                    }
+
+                    return id; // Return the detail_id
+                })
+            );
+
+            res.status(200).json({ message: 'Order updated successfully!', orderId, detailIds: insertOrderDetailsQuery });
+        } else {
+            // If the order does not exist, create a new order
+            const orderNum = generateOrderNumber();
+            const insertOrderQuery = await queryPromise('INSERT INTO orders (order_num, user_id, order_status, order_state, order_create) VALUES (?, ?, ?, ?, NOW())', [orderNum, userId, 'Inactive', 'pending']);
+            const newOrderId = insertOrderQuery.insertId;
+
+            const insertOrderDetailsQuery = await Promise.all(
+                orders.map(async (order, index) => {
+                    const { id, itemName, quantity, price, link } = order;
+                    const detailPath = req.files[index] ? `/uploads/images_order/${req.files[index].filename}` : null;
+                    const insertDetailQuery = await queryPromise('INSERT INTO order_detail (order_id, detail_id, detail_name, detail_quantity, detail_price, detail_url, detail_path, detail_create) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())', [newOrderId, id, itemName, quantity, price, link, detailPath]);
+                    return insertDetailQuery.insertId; // Return the detail_id
+                })
+            );
+
+            res.status(200).json({ message: 'Order created successfully!', orderId: newOrderId, detailIds: insertOrderDetailsQuery });
+        }
+    } catch (error) {
+        console.error('Error creating or updating order and details:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+//Api Inspector
+
 
 
 const PORT = 3001;

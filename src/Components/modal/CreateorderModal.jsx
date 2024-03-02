@@ -4,19 +4,13 @@ import { FaPlus, FaMinus, FaLink } from "react-icons/fa";
 import { RiDeleteBin6Fill } from "react-icons/ri";
 import { MdAttachFile } from "react-icons/md";
 import { useAlert } from './../../Admin/components/AlertContext';
+import { useAuth } from '../useAuth';
 
 const CreateorderModal = ({ open, onClose }) => {
 
-    const { showAlert } = useAlert();
+    const { user } = useAuth();
 
-    const handleConfirm = () => {
-        
-        // Close the modal
-        onClose();
-    
-        // Show the alert
-        showAlert('success', 'Order created successfully!');
-      };
+    const { showAlert } = useAlert();
 
     const [orders, setOrders] = useState([
         { id: 1, itemName: '', link: '', price: '', quantity: 1 },
@@ -60,6 +54,40 @@ const CreateorderModal = ({ open, onClose }) => {
 
     const calculateTotal = () => {
         return orders.reduce((total, order) => total + order.price * order.quantity, 0);
+    };
+
+    const handleConfirm = async () => {
+        try {
+
+            if (orders.length === 0) {
+                showAlert('error', 'Please add at least one order.');
+                return;
+            }
+
+            const formData = new FormData();
+            
+            formData.append('orders', JSON.stringify(orders));
+
+            orders.forEach((order, index) => {
+                formData.append('detailPath', order.picture || null);
+            });
+
+            const createOrderResponse = await fetch(`http://localhost:3001/api/user/createorderanduploadimages/${user.id}`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (createOrderResponse.ok) {
+                showAlert('success', 'Order created successfully!');
+                setOrders([{ id: 1, itemName: '', link: '', price: '', quantity: 1 }]);
+                setShowLinkInput(false);
+                onClose();
+            } else {
+                showAlert('error', `Failed to create order: ${createOrderResponse.statusText}`);
+            }
+        } catch (error) {
+            showAlert('error', `Error creating order: ${error.message}`);
+        }
     };
 
     return (
@@ -124,13 +152,14 @@ const CreateorderModal = ({ open, onClose }) => {
                                                 type="file"
                                                 id={`file-${order.id}`}
                                                 className="hidden"
-                                                onChange={(e) =>
+                                                onChange={(e) => {
+                                                    const selectedFile = e.target.files[0];
                                                     setOrders((prevOrders) =>
                                                         prevOrders.map((o) =>
-                                                            o.id === order.id ? { ...o, picture: e.target.files[0] } : o
+                                                            o.id === order.id ? { ...o, picture: selectedFile } : o
                                                         )
-                                                    )
-                                                }
+                                                    );
+                                                }}
                                             />
                                         </label>
                                     </div>

@@ -3,7 +3,7 @@ import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@materia
 import { IoClose } from "react-icons/io5";
 import { useAlert } from './../../components/AlertContext';
 
-const DeleteorderModal = ({ open, onClose, onConfirm, orderNo, orderId }) => {
+const DeleteorderModal = ({ open, onClose, orderNo, orderId }) => {
     const { showAlert } = useAlert();
     const [loading, setLoading] = useState(false);
 
@@ -35,14 +35,6 @@ const DeleteorderModal = ({ open, onClose, onConfirm, orderNo, orderId }) => {
         } catch (error) {
             console.error('Error deleting order:', error);
             showAlert('error', `Failed to delete order: ${error.message}`);
-        } finally {
-            // Reset loading state
-            setLoading(false);
-
-            // Invoke the onConfirm callback
-            if (typeof onConfirm === 'function') {
-                onConfirm();
-            }
         }
     };
 

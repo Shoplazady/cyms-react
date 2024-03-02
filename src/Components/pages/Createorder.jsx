@@ -6,9 +6,10 @@ import { FiEdit } from "react-icons/fi";
 import { RiDeleteBin6Fill } from "react-icons/ri";
 import { Button } from '@material-tailwind/react';
 import CreateorderModal from './../modal/CreateorderModal';
-import EdituserModal from './../modal/EditorderModal';
+import EditorderModal from './../modal/EditorderModal';
 import DetailorderModal from './../modal/DetailorderModal';
 import DeleteModal from '../modal/DeleteModal';
+import ActiveorderModal from '../modal/ActiveorderModal';
 import { useAuth } from '../useAuth';
 
 
@@ -19,6 +20,7 @@ const Createorder = ({ ordersPerPage, onPageChange, onSearchChange }) => {
     const [createOrderModalOpen, setCreateOrderModalOpen] = useState(false);
     const [editOrderModalOpen, setEditOrderModalOpen] = useState(false);
     const [detailOrderModalOpen, setDetailOrderModalOpen] = useState(false);
+    const [activeOrderModalOpen, setActiveOrderModalOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
     const [orders, setOrders] = useState([]);
@@ -34,14 +36,45 @@ const Createorder = ({ ordersPerPage, onPageChange, onSearchChange }) => {
     const openCreateOrderModal = () => setCreateOrderModalOpen(true);
     const closeCreateOrderModal = () => setCreateOrderModalOpen(false);
 
-    const openEditOrderModal = () => setEditOrderModalOpen(true);
-    const closeEditOrderModal = () => setEditOrderModalOpen(false);
+    const openEditOrderModal = (order) => {
+        setSelectedOrder(order);
+        setEditOrderModalOpen(true);
+    };
 
-    const openDetailOrderModal = () => setDetailOrderModalOpen(true);
-    const closeDetailOrderModal = () => setDetailOrderModalOpen(false);
+    const closeEditOrderModal = () => {
+        setSelectedOrder(null);
+        setEditOrderModalOpen(false);
+    };
 
-    const openDeleteModal = () => setDeleteModalOpen(true);
-    const closeDeleteModal = () => setDeleteModalOpen(false);
+    const openDetailOrderModal = (order) => {
+        setSelectedOrder(order);
+        setDetailOrderModalOpen(true);
+    };
+
+    const closeDetailOrderModal = () => {
+        setSelectedOrder(null);
+        setDetailOrderModalOpen(false);
+    };
+
+    const openActiveOrderModal = (order) => {
+        setSelectedOrder(order);
+        setActiveOrderModalOpen(true);
+    };
+
+    const closeActiveOrderModal = () => {
+        setSelectedOrder(null);
+        setActiveOrderModalOpen(false);
+    };
+
+    const openDeleteModal = (order) => {
+        setSelectedOrder(order);
+        setDeleteModalOpen(true);
+    };
+
+    const closeDeleteModal = () => {
+        setSelectedOrder(null);
+        setDeleteModalOpen(false);
+    };
 
     const handlePageChange = (page) => {
         if (page > 0 && page <= totalPages) {
@@ -100,9 +133,9 @@ const Createorder = ({ ordersPerPage, onPageChange, onSearchChange }) => {
         // Fetch orders using the user ID
         const fetchOrders = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/user/orders/${user.id}`);
+                const response = await fetch(`http://localhost:3001/api/user/orders/${user.id}?page=${currentPage}&ordersPerPage=${ordersPerPage}&searchTerm=${searchTerm}`);
                 if (!response.ok) {
-                    throw new Error('Failed to fetch orders');
+                    throw new Error(`Failed to fetch orders: ${response.statusText}`);
                 }
                 const data = await response.json();
                 setOrders(data.orders);
@@ -112,12 +145,11 @@ const Createorder = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                 console.error('Error fetching orders:', error.message);
             }
         };
-
-        // Call the fetchOrders function when the user ID changes
+        
         if (user) {
             fetchOrders();
         }
-    }, [user, currentPage]);
+    }, [user, currentPage, ordersPerPage, searchTerm, orders]);
 
     return (
         <div>
@@ -240,8 +272,8 @@ const Createorder = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                                         Order detail
                                         <FiEdit
                                             className='hover:text-blue-500'
-                                            onClick={openDetailOrderModal} />
-                                        <DetailorderModal open={detailOrderModalOpen} onClose={closeDetailOrderModal} />
+                                            onClick={() => openDetailOrderModal(order)} />
+                                        <DetailorderModal open={detailOrderModalOpen} onClose={closeDetailOrderModal} detailId={selectedOrder?.order_id} />
                                     </td>
                                     <td className="px-6 py-4">
                                         {order.order_create}
@@ -262,23 +294,44 @@ const Createorder = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                                             {order.order_status}
                                             <FiEdit
                                                 className='hover:text-blue-500'
-                                                 />
+                                                onClick={() => openActiveOrderModal(order)} />
                                         </div>
+                                        <ActiveorderModal open={activeOrderModalOpen} onClose={closeActiveOrderModal} orderId={selectedOrder?.order_id} orderNo={selectedOrder?.order_num} />
                                     </td>
                                     <td className="px-6 py-4">
                                         {order.total_price}
                                     </td>
-                                    <td className="flex items-center space-x-3 px-6 py-4">
-                                        <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
-                                            onClick={openEditOrderModal}>
-                                            <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
-                                                Edit
-                                            </span>
-                                        </Button>
-                                        <EdituserModal open={editOrderModalOpen} onClose={closeEditOrderModal} />
-                                        <MdLocalPrintshop className='w-5 h-5' />
-                                        <RiDeleteBin6Fill className='w-5 h-5 text-red-500 hover:text-red-700' onClick={openDeleteModal} />
-                                        <DeleteModal open={deleteModalOpen} onClose={closeDeleteModal} />
+                                    <td className="flex items-center px-6 py-4">
+                                        {/* Edit Button */}
+                                        <div className="button-container">
+                                            <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
+                                                onClick={() => openEditOrderModal(order)}>
+                                                <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
+                                                    Edit
+                                                </span>
+                                            </Button>
+                                        </div>
+                                        {/* Delete Button */}
+                                        <div className="button-container">
+                                            <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800"
+                                                onClick={() => openDeleteModal(order)} >
+                                                <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
+                                                    <RiDeleteBin6Fill className='text-red-500 w-5 h-5' />
+                                                </span>
+                                            </Button>
+                                        </div>
+
+                                        {/* Print Button */}
+                                        <div className="button-container">
+                                            <Button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-50 rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 hover:text-white dark:text-gray-900 focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800">
+                                                <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 dark:bg-gray-50 rounded-md group-hover:bg-opacity-0">
+                                                    <MdLocalPrintshop className='w-5 h-5' />
+                                                </span>
+                                            </Button>
+                                        </div>
+
+                                        <EditorderModal open={editOrderModalOpen} onClose={closeEditOrderModal} orderId={selectedOrder?.order_id} orderUid={user.id} />
+                                        <DeleteModal open={deleteModalOpen} onClose={closeDeleteModal} orderId={selectedOrder?.order_id} orderNo={selectedOrder?.order_num} />
                                     </td>
                                 </tr>
                             ))
