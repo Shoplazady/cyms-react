@@ -914,6 +914,23 @@ app.put('/api/user/editdetailimages/:userId', upload.array('picture'), async (re
     }
 });
 
+app.get('/api/user/agency/options', async (req, res) => {
+    try {
+        const usersQuery = await queryPromise(`
+            SELECT cat_id, cat_name
+            FROM category
+            WHERE cat_status = 'Active'
+        `);
+
+        res.status(200).json({ agency: usersQuery });
+    } catch (error) {
+        console.error('Error retrieving user data for select options:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+
+
 //Api Inspector
 app.get('/api/inspector/orders', async (req, res) => {
     try {
