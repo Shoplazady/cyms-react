@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { IoMdMoon, IoMdSunny, IoMdHelp } from "react-icons/io";
-import { FaUserEdit } from "react-icons/fa";
+import { FaUserEdit , FaUserCircle } from "react-icons/fa";
 import { IoNotifications } from "react-icons/io5";
 import { FiAlignJustify, FiArrowUp, FiLogOut } from "react-icons/fi";
 import { FaHome, FaPlus, FaClipboard } from 'react-icons/fa';
@@ -22,6 +22,7 @@ import { useAuth } from "./useAuth";
 
 const Navbar = () => {
 
+
     const [openNav, setOpenNav] = React.useState(false);
 
     const { isDarkMode, toggleDarkMode } = useDarkMode();
@@ -40,7 +41,11 @@ const Navbar = () => {
     };
 
     const profileMenuItems = [
-        {
+        {   
+            label: `${user.first_name} ${user.last_name}`,
+            icon: FaUserCircle,
+        },
+        {   
             label: "Edit Profile",
             icon: FaUserEdit,
         },
@@ -165,7 +170,7 @@ const Navbar = () => {
                                     </MenuHandler>
                                     {/* Profile menu */}
                                     {isMenuOpen && (
-                                        <MenuList className={`p-1 ${isDarkMode ? 'bg-neutral-100 text-stone-800' : 'bg-zinc-700 text-stone-100'}`}>
+                                        <MenuList className={`p-2 space-y-2 ${isDarkMode ? 'bg-neutral-100 text-stone-800' : 'bg-zinc-700 text-stone-100'}`}>
                                             {profileMenuItems.map(({ label, icon, onClick }, key) => (
                                                 <MenuItem
                                                     key={label}

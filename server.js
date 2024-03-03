@@ -933,6 +933,7 @@ app.get('/api/inspector/orders', async (req, res) => {
                 orders.order_num,
                 users.first_name,
                 users.last_name,
+                users.position,
                 DATE_FORMAT(orders.order_create, '%Y-%m-%d %H:%i:%s') AS order_create,
                 orders.order_state,
                 orders.order_status,
@@ -942,12 +943,12 @@ app.get('/api/inspector/orders', async (req, res) => {
                 JOIN users ON orders.user_id = users.id
                 JOIN order_detail ON orders.order_id = order_detail.order_id
             WHERE
-                users.first_name LIKE ? OR users.last_name LIKE ? OR orders.order_num LIKE ?
+            users.first_name LIKE ? OR users.last_name LIKE ? OR orders.order_num LIKE ? OR users.position LIKE ?
             GROUP BY
                 orders.order_id
             ORDER BY orders.order_create DESC
             LIMIT ? OFFSET ?`,
-            [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`, ordersPerPage, offset]
+            [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`, ordersPerPage, offset]
         );
 
         // Query to get total number of filtered orders
@@ -956,8 +957,8 @@ app.get('/api/inspector/orders', async (req, res) => {
             FROM orders
             JOIN users ON orders.user_id = users.id
             JOIN order_detail ON orders.order_id = order_detail.order_id
-            WHERE users.first_name LIKE ? OR users.last_name LIKE ? OR orders.order_num LIKE ?`,
-            [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`]
+            WHERE users.first_name LIKE ? OR users.last_name LIKE ? OR users.position LIKE ? OR orders.order_num LIKE ?`,
+            [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`]
         );
         const totalOrders = totalOrdersQuery[0].total;
 
@@ -1020,7 +1021,20 @@ app.put('/api/inspector/order/updateState/:orderId', async (req, res) => {
     }
 });
 
+app.get('/api/inspector/job/options', async (req, res) => {
+    try {
+        const usersQuery = await queryPromise(`
+            SELECT job_id, job_name
+            FROM job_position
+            WHERE job_status = 'Active'
+        `);
 
+        res.status(200).json({ jobs: usersQuery });
+    } catch (error) {
+        console.error('Error retrieving user data for select options:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
 
 const PORT = 3001;
 

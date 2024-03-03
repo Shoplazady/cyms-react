@@ -4,13 +4,7 @@ import { FaArrowsUpDown } from "react-icons/fa6";
 import { MdLocalPrintshop } from "react-icons/md";
 import { FiEdit } from "react-icons/fi";
 import { RiDeleteBin6Fill } from "react-icons/ri";
-import { IoIosArrowDown } from "react-icons/io";
-import {
-    Button, Menu,
-    MenuHandler,
-    MenuList,
-    MenuItem,
-} from '@material-tailwind/react';
+import { Button } from '@material-tailwind/react';
 import EditorderModal from './../modal/EditorderModal';
 import DetailorderModal from './../modal/DetailorderModal';
 import DeleteModal from '../modal/DeleteModal';
@@ -40,16 +34,6 @@ const Orderlist = ({ ordersPerPage, onPageChange, onSearchChange }) => {
     const [selectedRows, setSelectedRows] = useState([]);
     const [selectedOrder, setSelectedOrder] = useState(null);
 
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-    const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
-    };
-
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    };
 
     const openCommentOrderModal = (order) => {
         setSelectedOrder(order);
@@ -181,35 +165,7 @@ const Orderlist = ({ ordersPerPage, onPageChange, onSearchChange }) => {
             <div className="flex items-center justify-between flex-column p-2 md:flex-row flex-wrap bg-gray-700 dark:bg-gray-50">
                 {/* Dropdown and search components */}
                 <div>
-                    <Menu open={isDropdownOpen} handler={setIsDropdownOpen} placement="bottom-start">
-                        <MenuHandler>
-                            <button
-                                id="dropdownActionButton"
-                                className="inline-flex items-center text-gray-100 bg-stone-800 focus:outline-none hover:bg-stone-900 focus:ring-4 font-medium rounded-lg shadow-md text-sm px-3 py-1.5 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
-                                type="button"
-                                onClick={toggleDropdown}
-                            >
-                                <span className="sr-only">Action button</span>
-                                Action
-                                <IoIosArrowDown className="w-3 h-3 ms-2.5" />
-                            </button>
-                        </MenuHandler>
-                        {/* Dropdown menu */}
-                        <MenuList className="z-10 bg-stone-800 dark:bg-stone-100 dark:border-gray-300 text-white dark:text-black">
-                            <MenuItem>
-                                Reward
-                            </MenuItem>
-                            <MenuItem>
-                                Promote
-                            </MenuItem>
-                            <MenuItem>
-                                Activate account
-                            </MenuItem>
-                            <MenuItem>
-                                Delete User
-                            </MenuItem>
-                        </MenuList>
-                    </Menu>
+
                 </div>
                 {/* Search input on the right */}
                 <div className="flex items-center">
@@ -254,6 +210,9 @@ const Orderlist = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                             </th>
                             <th scope="col" className="px-6 py-3">
                                 Employee name
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                Job Position
                             </th>
                             <th scope="col" className="px-6 py-3">
                                 <div className="flex items-center">
@@ -310,9 +269,12 @@ const Orderlist = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                                     <td className="px-6 py-4">
                                         {order.order_num}
                                     </td>
-                                    <th scope="row" className="px-6 py-4 font-medium text-gray-200 whitespace-nowrap dark:text-gray-900">
+                                    <td scope="row" className="px-6 py-4 font-medium text-gray-200 whitespace-nowrap dark:text-gray-900">
                                         {order.first_name} {order.last_name}
-                                    </th>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {order.position}
+                                    </td>
                                     <td className="flex items-center justify-between px-6 py-4">
                                         Order detail
                                         <FiEdit
