@@ -269,7 +269,7 @@ const Orderlist = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                                     <td className="px-6 py-4">
                                         {order.order_num}
                                     </td>
-                                    <td scope="row" className="px-6 py-4 font-medium text-gray-200 whitespace-nowrap dark:text-gray-900">
+                                    <td className="px-6 py-4 font-medium text-gray-200 whitespace-nowrap dark:text-gray-900">
                                         {order.first_name} {order.last_name}
                                     </td>
                                     <td className="px-6 py-4">

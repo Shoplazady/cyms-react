@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DarkModeProvider } from './hooks/useDarkMode';
 import MainContent from './Components/MainContent';
 import Login from './Components/pages/Login';
+import Profilepage from './Components/pages/Profilepage';
 import Createorder from './Components/pages/Createorder';
 import Orderlist from './Components/pages/Orderlist';
 import Register from './Components/pages/Register';
@@ -31,6 +32,7 @@ function App() {
                     <Route path="/" element={<MainContent />} />
                     <Route path="/create" element={<Createorder />} />
                     <Route path="/list" element={<Orderlist />} />
+                    <Route path="/profile" element={<Profilepage />} />
                   </Routes>
                 </Layout>
               }

@@ -4,7 +4,7 @@ import {
   IoSpeedometerOutline,
   IoPeopleOutline,
 } from 'react-icons/io5';
-import { FaPlus, FaList, FaAngleDown , FaShoppingCart } from 'react-icons/fa';
+import { FaList, FaAngleDown , FaShoppingCart } from 'react-icons/fa';
 import { FaClipboardCheck } from "react-icons/fa6";
 import Logo from '../../Components/images/logo_full.png';
 import { Button } from "@material-tailwind/react";

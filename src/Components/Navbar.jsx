@@ -33,6 +33,10 @@ const Navbar = () => {
 
     const navigate = useNavigate();
 
+    const handleEditProfile = () => {
+        navigate('/profile');
+    };
+
     const handleLogout = () => {
 
         console.log("Logging out...");
@@ -41,13 +45,14 @@ const Navbar = () => {
     };
 
     const profileMenuItems = [
-        {   
+        user && {   
             label: `${user.first_name} ${user.last_name}`,
             icon: FaUserCircle,
         },
         {   
             label: "Edit Profile",
             icon: FaUserEdit,
+            onClick: handleEditProfile,
         },
         {
             label: "Help",
@@ -58,7 +63,7 @@ const Navbar = () => {
             icon: FiLogOut,
             onClick: handleLogout,
         },
-    ];
+    ].filter(Boolean);
 
     const navigation = [
         { name: 'Home', href: '/', icon: <FaHome />, current: false },

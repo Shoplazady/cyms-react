@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@material-tailwind/react';
 import { FaPlus, FaMinus, FaLink } from "react-icons/fa";
 import { RiDeleteBin6Fill } from "react-icons/ri";
-import { MdAttachFile } from "react-icons/md";
 import { useAlert } from '../../Admin/components/AlertContext';
 
 const EditorderModal = ({ open, onClose, orderId, orderUid }) => {
