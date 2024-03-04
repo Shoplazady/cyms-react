@@ -20,7 +20,6 @@ const Profilepage = () => {
     const fetchUserData = async () => {
       try {
         if (!user || !user.id) {
-          // If user is null or user.id is undefined, handle accordingly
           console.error('User is null or user.id is undefined');
           return;
         }
@@ -32,7 +31,7 @@ const Profilepage = () => {
 
         const userData = await response.json();
         setUserData(userData);
-
+        console.log(userData);
       } catch (error) {
         console.error('Error fetching user data:', error.message);
       }
@@ -66,19 +65,25 @@ const Profilepage = () => {
       }
     };
 
-    const setDefaultValues = () => {
-      setSelectedPosition(positions.find(option => option.value === userData.position) || null);
-      setSelectedAgency(agencies.find(option => option.value === userData.agency) || null);
-    };
-
+    // Fetch data when user changes
     if (user) {
       fetchUserData();
       fetchAgenciesForSelectOptions();
       fetchPositionsForSelectOptions();
-      setDefaultValues();
     }
 
-  }, [userData.position, userData.agency, user]);
+  }, [user]);
+
+  useEffect(() => {
+    
+    const defaultPosition = { value: userData?.position || '', label: userData?.position || 'Select an option...' };
+    const defaultAgency = { value: userData?.agency || '', label: userData?.agency || 'Select an option...' };
+
+    setSelectedPosition(defaultPosition);
+    setSelectedAgency(defaultAgency);
+
+  }, [userData]);
+
 
   const handleInputChange = (e) => {
     // Update the user state when input fields change
