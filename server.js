@@ -929,6 +929,11 @@ app.get('/api/user/agency/options', async (req, res) => {
     }
 });
 
+app.put('/api/user/editprofile/:userId', async (req, res) => {
+    console.log(req.body);
+});
+
+
 
 
 //Api Inspector

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Select from 'react-select';
 import { useAuth } from '../useAuth';
 import { useAlert } from "../../Admin/components/AlertContext";
+import axios from 'axios';
 
 const Profilepage = () => {
 
@@ -15,6 +16,8 @@ const Profilepage = () => {
   const [positions, setPositions] = useState([]);
   const [selectedAgency, setSelectedAgency] = useState(null);
   const [selectedPosition, setSelectedPosition] = useState(null);
+
+  const [profilePicture, setProfilePicture] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -75,7 +78,7 @@ const Profilepage = () => {
   }, [user]);
 
   useEffect(() => {
-    
+
     const defaultPosition = { value: userData?.position || '', label: userData?.position || 'Select an option...' };
     const defaultAgency = { value: userData?.agency || '', label: userData?.agency || 'Select an option...' };
 
@@ -93,21 +96,62 @@ const Profilepage = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Handle form submission here, e.g., update user data, change password, etc.
-  };
-
   const handleProfilePictureChange = (e) => {
-    const file = e.target.files[0];
-    // Handle the file upload logic here
-    // You may want to use FormData to send the file to your server
-    // Example:
-    // const formData = new FormData();
-    // formData.append('profilePicture', file);
-    // then send the formData to your server
+    setProfilePicture(e.target.files[0]);
   };
+
+  const handleEditProfile = async () => {
+    
+    const formData = new FormData();
+    formData.append('first_name', userData.first_name);
+    formData.append('last_name', userData.last_name);
+    formData.append('tel_num', userData.tel_num);
+    formData.append('job_position', selectedPosition?.value || '');
+    formData.append('agency', selectedAgency?.value || '');
+    formData.append('email', userData.email);
+    formData.append('new_password', newPassword);
+  
+    try {
+
+      const editProfileResponse = await fetch(`http://localhost:3001/api/user/editprofile/${user.id}`, {
+                method: 'PUT',
+                body: formData,
+            });
+  
+            const data = await editProfileResponse.json();
+            console.log(data);
+  
+      if (editProfileResponse.ok) {
+        throw new Error(`Failed to update profile data: ${editProfileResponse.statusText}`);
+      }
+  
+      showAlert('success', 'Profile data updated successfully');
+    } catch (error) {
+      showAlert('error', `Error updating profile data: ${error.message}`);
+    }
+  };
+
+  const handleEditProfilePicture = async () => {
+    
+    try {
+      const formData = new FormData();
+      formData.append('profilePic', profilePicture);
+
+      const response = await fetch(`http://localhost:3001/api/user/editprofileimages/${user.id}`, {
+        method: 'PUT',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update profile picture: ${response.statusText}`);
+      }
+
+      showAlert('success', 'Profile picture updated successfully');
+    } catch (error) {
+      showAlert('error', `Error updating profile picture: ${error.message}`);
+    }
+  };
+
 
   return (
     <div className="flex items-center justify-center">
@@ -117,15 +161,20 @@ const Profilepage = () => {
         <div className="flex flex-col items-center p-6 w-96 bg-gray-800 dark:bg-white rounded-lg">
           <div className="flex flex-col justify-center items-center pt-16">
             <label className="mb-1 text-5xl font-medium dark:text-gray-900 text-white pb-4">Profile</label>
-            <img className="rounded-full w-40 h-40" src={userData.picture_path || 'uploads/user_pic/avatar.png'} alt="profile image" />
-            {/* Replace the static label with an input file */}
-            <input
-              type="file"
-              id="profilePicture"
-              accept="image/*"
-              onChange={(e) => handleProfilePictureChange(e)}
-              className="text-sm dark:text-gray-900 text-white p-2.5 bg-gray-700 border border-gray-600 rounded-lg mt-2"
-            />
+            <img className="rounded-full w-40 h-40" src={userData.picture_path || 'uploads/user_pic/avatar.png'} alt="profileuser" />
+            <form>
+              <input
+                type="file"
+                id="profilePicture"
+                accept="image/*"
+                onChange={handleProfilePictureChange}
+                className="text-sm dark:text-gray-900 text-white p-2.5 bg-gray-700 border border-gray-600 rounded-lg mt-2"
+              />
+            </form>
+            <button onClick={handleEditProfilePicture} className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-2">
+              Update Profile Picture
+            </button>
+
           </div>
         </div>
 
@@ -134,7 +183,7 @@ const Profilepage = () => {
           <div className="w-full dark:bg-white border dark:border-gray-200 rounded-lg shadow bg-gray-800 border-gray-700 ">
             <div className="flex flex-col justify-center p-6 ">
               <h1 className="mb-1 text-2xl font-medium dark:text-gray-900 text-white">User data</h1>
-              <form onSubmit={handleSubmit}>
+              <form>
 
 
                 {/* First row */}
@@ -220,19 +269,7 @@ const Profilepage = () => {
 
                 {/* Change Password */}
                 <h1 className="mb-1 text-2xl font-medium dark:text-gray-900 text-white">Change Password</h1>
-                <div className="grid gap-6 mb-6 md:grid-cols-2">
-                  <div className="">
-                    <label htmlFor="old_password" className="block mb-2 text-sm font-medium dark:text-gray-900 text-white pr-2">Old Password</label>
-                    <input
-                      type="password"
-                      id="password"
-                      value={userData?.password || ''}
-                      onChange={handleInputChange}
-                      className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
-                      placeholder="•••••••••"
-                      required
-                    />
-                  </div>
+                <div className="grid gap-6 mb-6 md:grid-cols-1">
                   <div className="">
                     <label htmlFor="new_password" className="block mb-2 text-sm font-medium dark:text-gray-900 text-white pr-2">New Password</label>
                     <input type="password" id="new_password" className="dark:bg-gray-50 border dark:border-gray-300 dark:text-gray-900 text-sm rounded-lg w-full p-2.5 bg-gray-700 border-gray-600 dark:placeholder-gray-400 text-white"
@@ -248,11 +285,11 @@ const Profilepage = () => {
                       value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                   </div>
                 </div>
-
-                <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-4">
-                  Save Changes
-                </button>
               </form>
+              <button onClick={handleEditProfile} className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-4">
+                Save Changes
+              </button>
+
             </div>
           </div>
         </div>
@@ -262,3 +299,4 @@ const Profilepage = () => {
 };
 
 export default Profilepage;
+
