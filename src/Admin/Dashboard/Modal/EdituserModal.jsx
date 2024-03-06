@@ -55,6 +55,7 @@ const Edituser = ({ open, onClose, userId }) => {
             const formData = new FormData();
             formData.append('first_name', user.first_name);
             formData.append('last_name', user.last_name);
+            formData.append('email', user.email);
             formData.append('position', user.position);
             formData.append('agency', user.agency);
             formData.append('tel_num', user.tel_num);
@@ -143,7 +144,6 @@ const Edituser = ({ open, onClose, userId }) => {
                                     onChange={handleInputChange}
                                     className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-full p-2.5 dark:bg-gray-50 dark:border-gray-300 dark:placeholder-gray-400 dark:text-gray-900"
                                     placeholder="123-456-789"
-                                    pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
                                     required
                                 />
                             </div>
@@ -158,6 +158,7 @@ const Edituser = ({ open, onClose, userId }) => {
                                 >
                                     <option value="" disabled>Select level</option>
                                     <option value="1">User</option>
+                                    <option value="2">Inspector</option>
                                     <option value="3">Admin</option>
 
                                 </select>

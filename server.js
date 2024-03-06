@@ -930,10 +930,72 @@ app.get('/api/user/agency/options', async (req, res) => {
 });
 
 app.put('/api/user/editprofile/:userId', async (req, res) => {
-    console.log(req.body);
+    const userId = req.params.userId;
+    const { first_name, last_name, tel_num, job_position, agency, email, new_password, confirmPassword } = req.body;
+
+    try {
+        // Check if the email and password match a user in the database
+        const result = await queryPromise('SELECT * FROM users WHERE id = ?', [userId]);
+
+        if (!result || result.length === 0) {
+            // If no matching user found, respond with an error
+            return res.status(401).json({ error: 'User not found' });
+        }
+
+        const userData = result[0];
+
+        // Check if the current password is correct
+        const passwordMatch = await bcrypt.compare(confirmPassword, userData.password);
+
+        if (!passwordMatch) {
+            // If the current password is incorrect, respond with an error
+            return res.status(401).json({ error: 'Current password is incorrect' });
+        }
+
+        // If a new password is provided, update the password
+        if (new_password) {
+            // Hash the new password
+            const hashedPassword = await bcrypt.hash(new_password, 10);
+
+            // Update the user's password in the database
+            await queryPromise('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, userId]);
+        }
+
+         // Update other profile fields
+         await queryPromise('UPDATE users SET first_name = ?, last_name = ?, tel_num = ?, position = ?, agency = ?, email = ? WHERE id = ?', [first_name, last_name, tel_num, job_position, agency, email, userId]);
+
+    } catch (error) {
+        console.error('Profile update error:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+
+    res.json({ success: true, message: 'Profile updated successfully' });
 });
 
+app.put('/api/user/editprofileimages/:userId', upload.array('profilePic'), async (req, res) => {
+    const userId = req.params.userId;
 
+    try {
+        // Check if the email and password match a user in the database
+        const result = await queryPromise('SELECT * FROM users WHERE id = ?', [userId]);
+
+        if (!result || result.length === 0) {
+            // If no matching user found, respond with an error
+            return res.status(401).json({ error: 'User not found' });
+        }
+
+        const Pic_path = req.files ? `/uploads/user_pic/${req.files[0].filename}` : null;
+
+         // Update other profile fields
+         await queryPromise('UPDATE users SET picture_path = ? WHERE id = ?', [ Pic_path, userId]);
+
+    } catch (error) {
+        console.error('Profile update error:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+
+    res.json({ success: true, message: 'Profile updated successfully' });
+});
 
 
 //Api Inspector
