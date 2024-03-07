@@ -53,7 +53,21 @@ const queryPromise = (sql, values) => {
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, file.fieldname === 'profilePic' ? 'public/uploads/user_pic' : 'public/uploads/images_order');
+        // Determine the folder based on the type of file
+        let folder;
+        if (file.fieldname === 'profilePic') {
+            folder = 'user_pic';
+        } else if (file.fieldname === 'imagesOrder') {
+            folder = 'images_order';
+        } else if (file.fieldname === 'signature') {
+            folder = 'user_e_signature';
+        } else {
+            // Handle other cases or set a default folder
+            folder = 'default_folder';
+        }
+
+        // Provide the complete path for the destination
+        cb(null, `public/uploads/${folder}`);
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -995,6 +1009,80 @@ app.put('/api/user/editprofileimages/:userId', upload.array('profilePic'), async
     }
 
     res.json({ success: true, message: 'Profile updated successfully' });
+});
+
+app.get('/api/user/getSignature/:userId', async (req, res) => {
+    try {
+        const userId = req.params.userId;
+
+        // Query the database to get the user's signature information
+        const result = await queryPromise('SELECT * FROM user_esignature WHERE user_id = ?', [userId]);
+
+        if (result.length > 0) {
+            // If the user has a signature, return the signature information
+            const signatureInfo = {
+                sigId: result[0].sig_id,
+                sigPath: result[0].sig_path,
+                sigCreate: result[0].sig_create,
+            };
+
+            res.status(200).json(signatureInfo);
+        } else {
+            // If the user does not have a signature, return an appropriate response
+            res.status(404).json({ error: 'User signature not found.' });
+        }
+    } catch (error) {
+        console.error('Error getting signature:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+
+app.get('/api/user/checkSignature/:userId', async (req, res) => {
+    try {
+        const userId = req.params.userId;
+
+        // Query the database to check if the user has a signature
+        const result = await queryPromise('SELECT COUNT(*) as count FROM user_esignature WHERE user_id = ?', [userId]);
+
+        // Check if the user has a signature
+        const hasSignature = result[0].count > 0;
+
+        res.status(200).json({ hasSignature });
+    } catch (error) {
+        console.error('Error checking signature:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+app.post('/api/user/saveSignature/:userId', upload.single('signature'), async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const signaturePath = req.file ? `/uploads/user_e_signature/${req.file.filename}` : null;
+
+        // Insert the user signature into the database
+        await queryPromise('INSERT INTO user_esignature (user_id, sig_path, sig_create) VALUES (?, ?, NOW())', [userId, signaturePath]);
+
+        res.status(200).json({ message: 'Signature saved successfully!' });
+    } catch (error) {
+        console.error('Error saving signature:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+app.post('/api/user/editSignature/:userId', upload.single('signature'), async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const signaturePath = req.file ? `/uploads/user_e_signature/${req.file.filename}` : null;
+
+        // Update the user signature in the database
+        await queryPromise('UPDATE user_esignature SET sig_path = ?, sig_create = NOW() WHERE user_id = ?', [signaturePath, userId]);
+
+        res.status(200).json({ message: 'Signature edited successfully!' });
+    } catch (error) {
+        console.error('Error editing signature:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
 });
 
 

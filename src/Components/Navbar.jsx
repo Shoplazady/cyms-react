@@ -153,7 +153,7 @@ const Navbar = () => {
                     <div className="flex items-center gap-x-1 ml-auto justify-end">
 
                         <div className="ml-3">
-                            {/* Profile avatar or login/signup buttons */}
+                            
                             {user ? (
                                 // Profile avatar
                                 <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">

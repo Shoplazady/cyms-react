@@ -7,6 +7,7 @@ import UserManage from './Dashboard/User';
 import Ordertable from './Dashboard/Table/Ordertable';
 import Category from './Dashboard/Table/Category';
 import JobTable from './Dashboard/Table/Jobposition';
+import Profilepage from './Dashboard/Profile';
 
 const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -25,6 +26,7 @@ const AdminLayout = () => {
               <div className="mx-auto p-2 md:p-4 2xl:p-6">
                 <Routes>
                   <Route path="/admin/" element={<AdminDashboard />} />
+                  <Route path="/admin/profile" element={<Profilepage />} />
                   <Route path="/admin/User" element={<UserManage />} />
                   <Route path="/admin/Order" element={<Ordertable />} />
                   <Route path="/admin/category" element={<Category />} />

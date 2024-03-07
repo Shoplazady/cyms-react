@@ -3,6 +3,7 @@ import Select from 'react-select';
 import { Button } from '@material-tailwind/react';
 import { useAuth } from '../useAuth';
 import { useAlert } from "../../Admin/components/AlertContext";
+import Esignature from "../modal/EsignatureModal";
 
 const Profilepage = () => {
   const { user } = useAuth();
@@ -17,6 +18,11 @@ const Profilepage = () => {
   const [selectedAgency, setSelectedAgency] = useState(null);
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [profilePicture, setProfilePicture] = useState(null);
+
+  const [signatureModalOpen, setSignatureModalOpen] = useState(false);
+
+  const opensignatureModal = () => setSignatureModalOpen(true);
+  const closeSignatureModal = () => setSignatureModalOpen(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -67,7 +73,7 @@ const Profilepage = () => {
     };
 
     // Fetch data when user changes
-    if (user) {
+    if (user && user.id) {
       fetchUserData();
       fetchAgenciesAndPositions();
     }
@@ -106,7 +112,7 @@ const Profilepage = () => {
         new_password: newPassword,
         confirmPassword: confirmPassword,
       };
-  
+
       const editProfileResponse = await fetch(`http://localhost:3001/api/user/editprofile/${user.id}`, {
         method: 'PUT',
         headers: {
@@ -114,17 +120,17 @@ const Profilepage = () => {
         },
         body: JSON.stringify(requestBody),
       });
-  
+
       if (!editProfileResponse.ok) {
         throw new Error(`Failed to update profile data: ${editProfileResponse.statusText}`);
       }
-  
+
       showAlert('success', 'Profile data updated successfully');
     } catch (error) {
       showAlert('error', `Error updating profile data: ${error.message}`);
     }
   };
-  
+
 
   const handleEditProfilePicture = async () => {
     try {
@@ -166,7 +172,15 @@ const Profilepage = () => {
             <Button onClick={handleEditProfilePicture} className="text-white bg-yellow-500 py-2 px-4 rounded-lg mt-2">
               Update Profile Picture
             </Button>
+
+
+            <Button onClick={opensignatureModal} className="text-white bg-green-700 py-2 px-4 rounded-lg mt-4">
+              Add E-Signature
+            </Button>
+
+
           </div>
+          <Esignature open={signatureModalOpen} onClose={closeSignatureModal} userId={userData.id} />
         </div>
         {/* Right side with user data */}
         <div className="flex w-auto max-w-md min-w-96 pr-2 ">
