@@ -166,11 +166,11 @@ const Profilepage = () => {
                 id="profilePicture"
                 accept="image/*"
                 onChange={handleProfilePictureChange}
-                className="text-sm dark:text-gray-900 text-white p-2.5 bg-gray-700 border border-gray-600 rounded-lg mt-2"
+                className="text-sm dark:text-gray-900 text-white p-2.5 bg-gray-700 dark:bg-gray-200 border border-gray-600 dark:border-gray-300 rounded-lg mt-2"
               />
             </form>
             <Button onClick={handleEditProfilePicture} className="text-white bg-yellow-500 py-2 px-4 rounded-lg mt-2">
-              Update Profile Picture
+              Change profile
             </Button>
 
 

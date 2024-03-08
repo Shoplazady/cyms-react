@@ -10,6 +10,7 @@ import EditorderModal from './../modal/EditorderModal';
 import DetailorderModal from './../modal/DetailorderModal';
 import DeleteModal from '../modal/DeleteModal';
 import ActiveorderModal from '../modal/ActiveorderModal';
+import StateModal from '../modal/StateModal';
 import { useAuth } from '../useAuth';
 
 
@@ -22,6 +23,7 @@ const Createorder = ({ ordersPerPage, onPageChange, onSearchChange }) => {
     const [detailOrderModalOpen, setDetailOrderModalOpen] = useState(false);
     const [activeOrderModalOpen, setActiveOrderModalOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [commentOrderOpen, setCommentOrderModalOpen] = useState(false);
 
     const [orders, setOrders] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -35,6 +37,16 @@ const Createorder = ({ ordersPerPage, onPageChange, onSearchChange }) => {
 
     const openCreateOrderModal = () => setCreateOrderModalOpen(true);
     const closeCreateOrderModal = () => setCreateOrderModalOpen(false);
+
+    const openCommentOrderModal = (order) => {
+        setSelectedOrder(order);
+        setCommentOrderModalOpen(true);
+    };
+
+    const closeCommentOrderModal = () => {
+        setSelectedOrder(null);
+        setCommentOrderModalOpen(false);
+    };
 
     const openEditOrderModal = (order) => {
         setSelectedOrder(order);
@@ -279,7 +291,27 @@ const Createorder = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                                         {order.order_create}
                                     </td>
                                     <td className="px-6 py-4">
-                                        {order.order_state}
+                                        <div className="flex items-center space-x-2">
+                                            {order.order_state === 'pending' ? (
+                                                <span className="relative flex h-3 w-3 me-1">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
+                                                </span>
+                                            ) : order.order_state === 'approve' ? (
+                                                <span className="relative flex h-3 w-3 me-1">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                                </span>
+                                            ) : (
+                                                <div className="h-2.5 w-2.5 rounded-full bg-red-500 me-1"></div>
+                                            )}
+                                            {order.order_state}
+                                            <FiEdit
+                                                className='hover:text-blue-500'
+                                                onClick={() => openCommentOrderModal(order)}
+                                            />
+                                        </div>
+                                        <StateModal open={commentOrderOpen} onClose={closeCommentOrderModal} orderId={selectedOrder?.order_id} orderNo={selectedOrder?.order_num} />
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center space-x-2">

@@ -1085,6 +1085,70 @@ app.post('/api/user/editSignature/:userId', upload.single('signature'), async (r
     }
 });
 
+app.get('/api/user/order/getState/:orderId', async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+
+        // Fetch the order state from the orders table
+        const orderStateQuery = await queryPromise('SELECT order_state FROM orders WHERE order_id = ?', [orderId]);
+
+        // Check if the order exists
+        if (!orderStateQuery || orderStateQuery.length === 0) {
+            return res.status(404).json({ error: 'Order not found.' });
+        }
+
+        const orderState = orderStateQuery[0].order_state;
+
+        // If the order state is 'not_approved', fetch the comment from the order_comments table
+        if (orderState === 'not_approved') {
+            const commentQuery = await queryPromise('SELECT comment_text FROM order_comments WHERE order_id = ?', [orderId]);
+            
+            if (commentQuery && commentQuery.length > 0) {
+                const comment = commentQuery[0].comment;
+                return res.status(200).json({ orderState, comment });
+            } else {
+                return res.status(500).json({ error: 'Error fetching comment for not_approved order.' });
+            }
+        }
+
+        // If the order state is not 'not_approved', return only the order state
+        res.status(200).json({ orderState });
+    } catch (error) {
+        console.error('Error retrieving order state:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+
+app.put('/api/user/order/updateState/:orderId', async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const { orderState } = req.body;
+
+        console.log(req.body);
+
+        // Fetch the current order state from the orders table
+        const currentOrderQuery = await queryPromise('SELECT order_state FROM orders WHERE order_id = ?', [orderId]);
+
+
+        // Check if the order exists
+        if (!currentOrderQuery || currentOrderQuery.length === 0) {
+            return res.status(404).json({ error: 'Order not found.' });
+        }
+
+        // Update the order state in the database
+        const updateOrderQuery = 'UPDATE orders SET order_state = ? WHERE order_id = ?';
+        await queryPromise(updateOrderQuery, [orderState, orderId]);
+
+
+        // Respond with success message
+        res.status(200).json({ success: true, message: 'Order state and comment updated successfully.' });
+    } catch (error) {
+        console.error('Error updating order state and comment:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
 
 //Api Inspector
 app.get('/api/inspector/orders', async (req, res) => {

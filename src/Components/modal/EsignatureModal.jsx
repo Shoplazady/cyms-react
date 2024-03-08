@@ -15,6 +15,15 @@ const Esignature = ({ open, onClose, userId }) => {
         const fetchSignature = async () => {
             try {
                 const response = await fetch(`http://localhost:3001/api/user/getSignature/${userId}`);
+
+                if (response.status === 404) {
+                    // User signature not found
+                    setHasSignature(false);
+                    setFetchingSignature(false);
+                    setEditMode(true);
+                    return;
+                }
+
                 const result = await response.json();
 
                 if (response.ok) {
@@ -31,10 +40,10 @@ const Esignature = ({ open, onClose, userId }) => {
                 setFetchingSignature(false);
             }
         };
+
         if (userId) {
             fetchSignature();
         }
-
     }, [userId, showAlert]);
 
     const handleEdit = () => {

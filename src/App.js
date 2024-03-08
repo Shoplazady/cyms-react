@@ -9,6 +9,7 @@ import Orderlist from './Components/pages/Orderlist';
 import Register from './Components/pages/Register';
 import Layout from './Components/Layout';
 import AuthGuard from './Components/AuthGuard';
+import InspectorGuard from './Components/InspectorGuard';
 import { AlertProvider } from './Admin/components/AlertContext';
 import { AuthProvider } from './Components/useAuth';
 import './styles/tailwind.css';
@@ -41,7 +42,10 @@ function App() {
                       {/* Createorder route */}
                       <Route path="/create" element={<Createorder />} />
                       {/* Orderlist route */}
-                      <Route path="/list" element={<Orderlist />} />
+                      <Route
+                        path="/list"
+                        element={<InspectorGuard element={<Orderlist />} />}
+                      />
                       {/* Profilepage route */}
                       <Route path="/profile" element={<Profilepage />} />
                     </Routes>
