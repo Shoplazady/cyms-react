@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@material-tailwind/react';
 import { IoClose } from "react-icons/io5";
 import { useAlert } from '../../Admin/components/AlertContext';
-import { useAuth } from '../useAuth';
+import { useCookies } from 'react-cookie'; 
 
 const CommentorderModal = ({ open, onClose, orderId, orderNo }) => {
     const { showAlert } = useAlert();
-
-    const { user } = useAuth();
+    const [cookies] = useCookies(['user']);
+    const userId = cookies.user.id;
  
     const [selectedState, setSelectedState] = useState('pending');
     const [comment, setComment] = useState('');
@@ -20,7 +20,7 @@ const CommentorderModal = ({ open, onClose, orderId, orderNo }) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    userId: user.id,
+                    userId: userId,
                     orderState: selectedState,
                     comment: selectedState === 'not_approved' ? comment : null,
                 }),

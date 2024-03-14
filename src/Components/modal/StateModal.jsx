@@ -14,10 +14,13 @@ const StateModal = ({ open, onClose, orderId, orderNo }) => {
             try {
                 const response = await fetch(`http://localhost:3001/api/user/order/getState/${orderId}`);
                 const result = await response.json();
-
+    
+                console.log('Response:', response);
+                console.log('Result:', result);
+    
                 if (response.ok) {
                     setSelectedState(result.orderState);
-                    setComment(result.comment_text || '');
+                    setComment(result.comment || '');
                 } else {
                     console.error(`Error fetching order state: ${result.error}`);
                     showAlert('error', `Error fetching order state: ${result.error}`);
@@ -27,7 +30,7 @@ const StateModal = ({ open, onClose, orderId, orderNo }) => {
                 showAlert('error', `Error fetching order state: ${error.message}`);
             }
         };
-
+    
         if (open) {
             fetchOrderState();
         }

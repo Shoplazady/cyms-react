@@ -1104,7 +1104,7 @@ app.get('/api/user/order/getState/:orderId', async (req, res) => {
             const commentQuery = await queryPromise('SELECT comment_text FROM order_comments WHERE order_id = ?', [orderId]);
             
             if (commentQuery && commentQuery.length > 0) {
-                const comment = commentQuery[0].comment;
+                const comment = commentQuery[0].comment_text;
                 return res.status(200).json({ orderState, comment });
             } else {
                 return res.status(500).json({ error: 'Error fetching comment for not_approved order.' });
@@ -1240,8 +1240,8 @@ app.put('/api/inspector/order/updateState/:orderId', async (req, res) => {
             // Check if there is an existing comment for the order
             if (currentCommentQuery && currentCommentQuery.length > 0) {
                 // Update the existing comment
-                const updateCommentQuery = 'UPDATE order_comments SET comment_text = ? WHERE order_id = ?';
-                await queryPromise(updateCommentQuery, [comment, orderId]);
+                const updateCommentQuery = 'UPDATE order_comments SET comment_text = ? , user_id = ? WHERE order_id = ?';
+                await queryPromise(updateCommentQuery, [comment, userId, orderId]);
             } else {
                 // Insert a new comment
                 const insertCommentQuery = 'INSERT INTO order_comments (order_id, user_id, comment_text, comment_date) VALUES (?, ?, ?, NOW())';
