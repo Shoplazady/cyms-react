@@ -11,12 +11,13 @@ import DetailorderModal from './../modal/DetailorderModal';
 import DeleteModal from '../modal/DeleteModal';
 import ActiveorderModal from '../modal/ActiveorderModal';
 import StateModal from '../modal/StateModal';
-import { useAuth } from '../useAuth';
+import { useCookies } from 'react-cookie'; // use new version.
 
 
 const Createorder = ({ ordersPerPage, onPageChange, onSearchChange }) => {
 
-    const { user } = useAuth();
+    const [cookies] = useCookies(['user']); // use new version.
+    const userId = cookies.user.id;
 
     const [createOrderModalOpen, setCreateOrderModalOpen] = useState(false);
     const [editOrderModalOpen, setEditOrderModalOpen] = useState(false);
@@ -145,7 +146,7 @@ const Createorder = ({ ordersPerPage, onPageChange, onSearchChange }) => {
         // Fetch orders using the user ID
         const fetchOrders = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/user/orders/${user.id}?page=${currentPage}&ordersPerPage=${ordersPerPage}&searchTerm=${searchTerm}`);
+                const response = await fetch(`http://localhost:3001/api/user/orders/${userId}?page=${currentPage}&ordersPerPage=${ordersPerPage}&searchTerm=${searchTerm}`);
                 if (!response.ok) {
                     throw new Error(`Failed to fetch orders: ${response.statusText}`);
                 }
@@ -158,10 +159,10 @@ const Createorder = ({ ordersPerPage, onPageChange, onSearchChange }) => {
             }
         };
         
-        if (user) {
+        if (userId) {
             fetchOrders();
         }
-    }, [user, currentPage, ordersPerPage, searchTerm, orders]);
+    }, [userId, currentPage, ordersPerPage, searchTerm, orders]);
 
     return (
         <div>
@@ -362,7 +363,7 @@ const Createorder = ({ ordersPerPage, onPageChange, onSearchChange }) => {
                                             </Button>
                                         </div>
 
-                                        <EditorderModal open={editOrderModalOpen} onClose={closeEditOrderModal} orderId={selectedOrder?.order_id} orderUid={user.id} />
+                                        <EditorderModal open={editOrderModalOpen} onClose={closeEditOrderModal} orderId={selectedOrder?.order_id} orderUid={userId} />
                                         <DeleteModal open={deleteModalOpen} onClose={closeDeleteModal} orderId={selectedOrder?.order_id} orderNo={selectedOrder?.order_num} />
                                     </td>
                                 </tr>
